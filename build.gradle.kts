@@ -1,4 +1,4 @@
-import com.diffplug.gradle.spotless.SpotlessPlugin
+import com.diffplug.gradle.spotless.SpotlessExtension
 import com.diffplug.spotless.LineEnding
 
 plugins {
@@ -8,6 +8,46 @@ plugins {
   signing
   id("com.diffplug.spotless") version "6.9.1"
   id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+}
+
+repositories {
+  mavenCentral()
+  maven("https://papermc.io/repo/repository/maven-public/")
+}
+
+val spotlessApply = rootProject.property("spotless.apply").toString().toBoolean()
+
+if (spotlessApply) {
+  configure<SpotlessExtension> {
+    lineEndings = LineEnding.UNIX
+    isEnforceCheck = false
+
+    format("encoding") {
+      target("*.*")
+      encoding("UTF-8")
+    }
+
+    java {
+      target("**/src/**/java/**/*.java")
+      importOrder()
+      removeUnusedImports()
+      endWithNewline()
+      indentWithSpaces(2)
+      trimTrailingWhitespace()
+      prettier(
+        mapOf(
+          "prettier" to "2.7.1",
+          "prettier-plugin-java" to "1.6.2"
+        )
+      ).config(
+        mapOf(
+          "parser" to "java",
+          "tabWidth" to 2,
+          "useTabs" to false
+        )
+      )
+    }
+  }
 }
 
 val signRequired = !rootProject.property("dev").toString().toBoolean()
@@ -28,7 +68,6 @@ subprojects {
   apply<JavaLibraryPlugin>()
   apply<MavenPublishPlugin>()
   apply<SigningPlugin>()
-  apply<SpotlessPlugin>()
 
   val qualifiedProjectName = project.extra["qualifiedProjectName"].toString()
 
@@ -71,16 +110,10 @@ subprojects {
     }
 
     build {
-      dependsOn(spotlessApply)
       dependsOn(jar)
       dependsOn(sourcesJar)
       dependsOn(javadocJar)
     }
-  }
-
-  repositories {
-    mavenCentral()
-    maven("https://papermc.io/repo/repository/maven-public/")
   }
 
   dependencies {
@@ -93,31 +126,6 @@ subprojects {
 
     testAnnotationProcessor(rootProject.libs.lombok)
     testAnnotationProcessor(rootProject.libs.annotations)
-  }
-
-  spotless {
-    lineEndings = LineEnding.UNIX
-    isEnforceCheck = false
-
-    java {
-      importOrder()
-      removeUnusedImports()
-      endWithNewline()
-      indentWithSpaces(2)
-      trimTrailingWhitespace()
-      prettier(
-        mapOf(
-          "prettier" to "2.7.1",
-          "prettier-plugin-java" to "1.6.2"
-        )
-      ).config(
-        mapOf(
-          "parser" to "java",
-          "tabWidth" to 2,
-          "useTabs" to false
-        )
-      )
-    }
   }
 
   publishing {
