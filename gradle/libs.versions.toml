@@ -11,5 +11,3 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
 terminable = { module = "tr.com.infumia:terminable", version.ref = "terminable" }
 paper = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
-velocity = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
-protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
