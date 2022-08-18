@@ -28,7 +28,7 @@ if (spotlessApply) {
     }
 
     java {
-      target("**/src/**/java/**/*.java")
+      target("**/src/main/java/**/*.java")
       importOrder()
       removeUnusedImports()
       endWithNewline()
