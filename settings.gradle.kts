@@ -1,4 +1,4 @@
-rootProject.name = "event"
+rootProject.name = "task"
 
 enableFeaturePreview("VERSION_CATALOGS")
 
