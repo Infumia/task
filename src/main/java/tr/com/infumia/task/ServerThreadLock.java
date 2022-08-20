@@ -11,7 +11,6 @@ import tr.com.infumia.terminable.Terminable;
  * an interface to determine server thread lock.
  */
 public interface ServerThreadLock extends Terminable {
-
   /**
    * creates a new server thread locker.
    *

@@ -15,24 +15,56 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import tr.com.infumia.terminable.Terminable;
 
+/**
+ * an interface to determine promises.
+ *
+ * @param <V> type of the promised value.
+ */
 @SuppressWarnings("unchecked")
 public interface Promise<V> extends Future<V>, Terminable {
-
+  /**
+   * creates a completed promise.
+   *
+   * @param value the value to create.
+   * @param <U> type of the promised value.
+   *
+   * @return a newly completed promise.
+   */
   @NotNull
   static <U> Promise<U> completed(@Nullable final U value) {
     return new PromiseImpl<>(value);
   }
 
+  /**
+   * creates an empty promise.
+   *
+   * @param <U> type of the promised object.
+   *
+   * @return a newly create empty promise.
+   */
   @NotNull
   static <U> Promise<U> empty() {
     return new PromiseImpl<>();
   }
 
+  /**
+   * creates a completed promise with exception.
+   *
+   * @param exception the exception to create.
+   * @param <U> type of the promised object.
+   *
+   * @return a newly created completed promise with exception.
+   */
   @NotNull
   static <U> Promise<U> exceptionally(@NotNull final Throwable exception) {
     return new PromiseImpl<>(exception);
   }
 
+  /**
+   * creates a completed promise with {@code null} object.
+   *
+   * @return a newly created completed promise.
+   */
   @NotNull
   static Promise<Void> start() {
     return Promise.completed(null);
@@ -494,9 +526,9 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Consumer<? super V> action
   ) {
     return this.thenApplyAsync(v -> {
-      action.accept(v);
-      return null;
-    });
+        action.accept(v);
+        return null;
+      });
   }
 
   @NotNull
@@ -530,12 +562,12 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delayTicks
   ) {
     return this.thenApplyDelayedAsync(
-      v -> {
-        action.accept(v);
-        return null;
-      },
-      delayTicks
-    );
+        v -> {
+          action.accept(v);
+          return null;
+        },
+        delayTicks
+      );
   }
 
   @NotNull
@@ -545,13 +577,13 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final TimeUnit unit
   ) {
     return this.thenApplyDelayedAsync(
-      v -> {
-        action.accept(v);
-        return null;
-      },
-      delay,
-      unit
-    );
+        v -> {
+          action.accept(v);
+          return null;
+        },
+        delay,
+        unit
+      );
   }
 
   @NotNull
@@ -560,12 +592,12 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delayTicks
   ) {
     return this.thenApplyDelayedSync(
-      v -> {
-        action.accept(v);
-        return null;
-      },
-      delayTicks
-    );
+        v -> {
+          action.accept(v);
+          return null;
+        },
+        delayTicks
+      );
   }
 
   @NotNull
@@ -575,13 +607,13 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final TimeUnit unit
   ) {
     return this.thenApplyDelayedSync(
-      v -> {
-        action.accept(v);
-        return null;
-      },
-      delay,
-      unit
-    );
+        v -> {
+          action.accept(v);
+          return null;
+        },
+        delay,
+        unit
+      );
   }
 
   @NotNull
@@ -589,9 +621,9 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Consumer<? super V> action
   ) {
     return this.thenApplySync(v -> {
-      action.accept(v);
-      return null;
-    });
+        action.accept(v);
+        return null;
+      });
   }
 
   @NotNull
@@ -605,7 +637,8 @@ public interface Promise<V> extends Future<V>, Terminable {
     };
   }
 
-  @NotNull <U> Promise<U> thenApplyAsync(
+  @NotNull
+  <U> Promise<U> thenApplyAsync(
     @NotNull Function<? super V, ? extends U> function
   );
 
@@ -634,29 +667,34 @@ public interface Promise<V> extends Future<V>, Terminable {
     };
   }
 
-  @NotNull <U> Promise<U> thenApplyDelayedAsync(
+  @NotNull
+  <U> Promise<U> thenApplyDelayedAsync(
     @NotNull Function<? super V, ? extends U> function,
     long delayTicks
   );
 
-  @NotNull <U> Promise<U> thenApplyDelayedAsync(
+  @NotNull
+  <U> Promise<U> thenApplyDelayedAsync(
     @NotNull Function<? super V, ? extends U> function,
     long delay,
     @NotNull TimeUnit unit
   );
 
-  @NotNull <U> Promise<U> thenApplyDelayedSync(
+  @NotNull
+  <U> Promise<U> thenApplyDelayedSync(
     @NotNull Function<? super V, ? extends U> function,
     long delayTicks
   );
 
-  @NotNull <U> Promise<U> thenApplyDelayedSync(
+  @NotNull
+  <U> Promise<U> thenApplyDelayedSync(
     @NotNull Function<? super V, ? extends U> function,
     long delay,
     @NotNull TimeUnit unit
   );
 
-  @NotNull <U> Promise<U> thenApplySync(
+  @NotNull
+  <U> Promise<U> thenApplySync(
     @NotNull Function<? super V, ? extends U> function
   );
 
@@ -671,16 +709,19 @@ public interface Promise<V> extends Future<V>, Terminable {
     };
   }
 
-  @NotNull <U> Promise<U> thenComposeAsync(
+  @NotNull
+  <U> Promise<U> thenComposeAsync(
     @NotNull Function<? super V, ? extends Promise<U>> function
   );
 
-  @NotNull <U> Promise<U> thenComposeDelayedAsync(
+  @NotNull
+  <U> Promise<U> thenComposeDelayedAsync(
     @NotNull Function<? super V, ? extends Promise<U>> function,
     long delayTicks
   );
 
-  @NotNull <U> Promise<U> thenComposeDelayedAsync(
+  @NotNull
+  <U> Promise<U> thenComposeDelayedAsync(
     @NotNull Function<? super V, ? extends Promise<U>> function,
     long delay,
     @NotNull TimeUnit unit
@@ -711,18 +752,21 @@ public interface Promise<V> extends Future<V>, Terminable {
     };
   }
 
-  @NotNull <U> Promise<U> thenComposeDelayedSync(
+  @NotNull
+  <U> Promise<U> thenComposeDelayedSync(
     @NotNull Function<? super V, ? extends Promise<U>> function,
     long delayTicks
   );
 
-  @NotNull <U> Promise<U> thenComposeDelayedSync(
+  @NotNull
+  <U> Promise<U> thenComposeDelayedSync(
     @NotNull Function<? super V, ? extends Promise<U>> function,
     long delay,
     @NotNull TimeUnit unit
   );
 
-  @NotNull <U> Promise<U> thenComposeSync(
+  @NotNull
+  <U> Promise<U> thenComposeSync(
     @NotNull Function<? super V, ? extends Promise<U>> function
   );
 
@@ -740,9 +784,9 @@ public interface Promise<V> extends Future<V>, Terminable {
   @NotNull
   default Promise<Void> thenRunAsync(@NotNull final Runnable action) {
     return this.thenApplyAsync(v -> {
-      action.run();
-      return null;
-    });
+        action.run();
+        return null;
+      });
   }
 
   @NotNull
@@ -776,12 +820,12 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delayTicks
   ) {
     return this.thenApplyDelayedAsync(
-      v -> {
-        action.run();
-        return null;
-      },
-      delayTicks
-    );
+        v -> {
+          action.run();
+          return null;
+        },
+        delayTicks
+      );
   }
 
   @NotNull
@@ -791,13 +835,13 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final TimeUnit unit
   ) {
     return this.thenApplyDelayedAsync(
-      v -> {
-        action.run();
-        return null;
-      },
-      delay,
-      unit
-    );
+        v -> {
+          action.run();
+          return null;
+        },
+        delay,
+        unit
+      );
   }
 
   @NotNull
@@ -806,12 +850,12 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delayTicks
   ) {
     return this.thenApplyDelayedSync(
-      v -> {
-        action.run();
-        return null;
-      },
-      delayTicks
-    );
+        v -> {
+          action.run();
+          return null;
+        },
+        delayTicks
+      );
   }
 
   @NotNull
@@ -821,20 +865,20 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final TimeUnit unit
   ) {
     return this.thenApplyDelayedSync(
-      v -> {
-        action.run();
-        return null;
-      },
-      delay,
-      unit
-    );
+        v -> {
+          action.run();
+          return null;
+        },
+        delay,
+        unit
+      );
   }
 
   @NotNull
   default Promise<Void> thenRunSync(@NotNull final Runnable action) {
     return this.thenApplySync(v -> {
-      action.run();
-      return null;
-    });
+        action.run();
+        return null;
+      });
   }
 }

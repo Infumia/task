@@ -60,13 +60,14 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final Function<Throwable, ? extends V> function
   ) {
     final var promise = new PromiseImpl<V>();
-    this.future().whenComplete((value, t) -> {
-      if (t == null) {
-        promise.complete(value);
-      } else {
-        this.executeAsync(new ExceptionallyRunnable<>(promise, function, t));
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t == null) {
+          promise.complete(value);
+        } else {
+          this.executeAsync(new ExceptionallyRunnable<>(promise, function, t));
+        }
+      });
     return promise;
   }
 
@@ -77,16 +78,17 @@ final class PromiseImpl<V> implements Promise<V> {
     final long delayTicks
   ) {
     final var promise = new PromiseImpl<V>();
-    this.future().whenComplete((value, t) -> {
-      if (t == null) {
-        promise.complete(value);
-      } else {
-        this.executeDelayedAsync(
-          new ExceptionallyRunnable<>(promise, function, t),
-          delayTicks
-        );
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t == null) {
+          promise.complete(value);
+        } else {
+          this.executeDelayedAsync(
+              new ExceptionallyRunnable<>(promise, function, t),
+              delayTicks
+            );
+        }
+      });
     return promise;
   }
 
@@ -98,13 +100,18 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final TimeUnit unit
   ) {
     final var promise = new PromiseImpl<V>();
-    this.future().whenComplete((value, t) -> {
-      if (t == null) {
-        promise.complete(value);
-      } else {
-        this.executeDelayedAsync(new ExceptionallyRunnable<>(promise, function, t), delay, unit);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t == null) {
+          promise.complete(value);
+        } else {
+          this.executeDelayedAsync(
+              new ExceptionallyRunnable<>(promise, function, t),
+              delay,
+              unit
+            );
+        }
+      });
     return promise;
   }
 
@@ -115,13 +122,17 @@ final class PromiseImpl<V> implements Promise<V> {
     final long delayTicks
   ) {
     final var promise = new PromiseImpl<V>();
-    this.future().whenComplete((value, t) -> {
-      if (t == null) {
-        promise.complete(value);
-      } else {
-        this.executeDelayedSync(new ExceptionallyRunnable<>(promise, function, t), delayTicks);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t == null) {
+          promise.complete(value);
+        } else {
+          this.executeDelayedSync(
+              new ExceptionallyRunnable<>(promise, function, t),
+              delayTicks
+            );
+        }
+      });
     return promise;
   }
 
@@ -133,13 +144,18 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final TimeUnit unit
   ) {
     final var promise = new PromiseImpl<V>();
-    this.future().whenComplete((value, t) -> {
-      if (t == null) {
-        promise.complete(value);
-      } else {
-        this.executeDelayedSync(new ExceptionallyRunnable<>(promise, function, t), delay, unit);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t == null) {
+          promise.complete(value);
+        } else {
+          this.executeDelayedSync(
+              new ExceptionallyRunnable<>(promise, function, t),
+              delay,
+              unit
+            );
+        }
+      });
     return promise;
   }
 
@@ -149,13 +165,14 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final Function<Throwable, ? extends V> function
   ) {
     final var promise = new PromiseImpl<V>();
-    this.future().whenComplete((value, t) -> {
-      if (t == null) {
-        promise.complete(value);
-      } else {
-        this.executeSync(new ExceptionallyRunnable<>(promise, function, t));
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t == null) {
+          promise.complete(value);
+        } else {
+          this.executeSync(new ExceptionallyRunnable<>(promise, function, t));
+        }
+      });
     return promise;
   }
 
@@ -246,7 +263,10 @@ final class PromiseImpl<V> implements Promise<V> {
     final long delayTicks
   ) {
     this.markAsSupplied();
-    this.executeDelayedAsync(new ThrowingSupplyRunnable<>(this, callable), delayTicks);
+    this.executeDelayedAsync(
+        new ThrowingSupplyRunnable<>(this, callable),
+        delayTicks
+      );
     return this;
   }
 
@@ -258,7 +278,11 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final TimeUnit unit
   ) {
     this.markAsSupplied();
-    this.executeDelayedAsync(new ThrowingSupplyRunnable<>(this, callable), delay, unit);
+    this.executeDelayedAsync(
+        new ThrowingSupplyRunnable<>(this, callable),
+        delay,
+        unit
+      );
     return this;
   }
 
@@ -269,7 +293,10 @@ final class PromiseImpl<V> implements Promise<V> {
     final long delayTicks
   ) {
     this.markAsSupplied();
-    this.executeDelayedSync(new ThrowingSupplyRunnable<>(this, callable), delayTicks);
+    this.executeDelayedSync(
+        new ThrowingSupplyRunnable<>(this, callable),
+        delayTicks
+      );
     return this;
   }
 
@@ -281,7 +308,11 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final TimeUnit unit
   ) {
     this.markAsSupplied();
-    this.executeDelayedSync(new ThrowingSupplyRunnable<>(this, callable), delay, unit);
+    this.executeDelayedSync(
+        new ThrowingSupplyRunnable<>(this, callable),
+        delay,
+        unit
+      );
     return this;
   }
 
@@ -309,13 +340,14 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final Function<? super V, ? extends U> function
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeAsync(new ApplyRunnable<>(promise, function, value));
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeAsync(new ApplyRunnable<>(promise, function, value));
+        }
+      });
     return promise;
   }
 
@@ -326,13 +358,17 @@ final class PromiseImpl<V> implements Promise<V> {
     final long delayTicks
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeDelayedAsync(new ApplyRunnable<>(promise, function, value), delayTicks);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeDelayedAsync(
+              new ApplyRunnable<>(promise, function, value),
+              delayTicks
+            );
+        }
+      });
     return promise;
   }
 
@@ -344,13 +380,18 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final TimeUnit unit
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeDelayedAsync(new ApplyRunnable<>(promise, function, value), delay, unit);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeDelayedAsync(
+              new ApplyRunnable<>(promise, function, value),
+              delay,
+              unit
+            );
+        }
+      });
     return promise;
   }
 
@@ -361,13 +402,17 @@ final class PromiseImpl<V> implements Promise<V> {
     final long delayTicks
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeDelayedSync(new ApplyRunnable<>(promise, function, value), delayTicks);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeDelayedSync(
+              new ApplyRunnable<>(promise, function, value),
+              delayTicks
+            );
+        }
+      });
     return promise;
   }
 
@@ -379,13 +424,18 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final TimeUnit unit
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeDelayedSync(new ApplyRunnable<>(promise, function, value), delay, unit);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeDelayedSync(
+              new ApplyRunnable<>(promise, function, value),
+              delay,
+              unit
+            );
+        }
+      });
     return promise;
   }
 
@@ -395,13 +445,14 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final Function<? super V, ? extends U> function
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeSync(new ApplyRunnable<>(promise, function, value));
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeSync(new ApplyRunnable<>(promise, function, value));
+        }
+      });
     return promise;
   }
 
@@ -411,13 +462,16 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final Function<? super V, ? extends Promise<U>> function
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeAsync(new ComposeRunnable<>(promise, function, value, false));
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeAsync(
+              new ComposeRunnable<>(promise, function, value, false)
+            );
+        }
+      });
     return promise;
   }
 
@@ -428,13 +482,17 @@ final class PromiseImpl<V> implements Promise<V> {
     final long delayTicks
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeDelayedAsync(new ComposeRunnable<>(promise, function, value, false), delayTicks);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeDelayedAsync(
+              new ComposeRunnable<>(promise, function, value, false),
+              delayTicks
+            );
+        }
+      });
     return promise;
   }
 
@@ -446,13 +504,18 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final TimeUnit unit
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeDelayedAsync(new ComposeRunnable<>(promise, function, value, false), delay, unit);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeDelayedAsync(
+              new ComposeRunnable<>(promise, function, value, false),
+              delay,
+              unit
+            );
+        }
+      });
     return promise;
   }
 
@@ -463,13 +526,17 @@ final class PromiseImpl<V> implements Promise<V> {
     final long delayTicks
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeDelayedSync(new ComposeRunnable<>(promise, function, value, true), delayTicks);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeDelayedSync(
+              new ComposeRunnable<>(promise, function, value, true),
+              delayTicks
+            );
+        }
+      });
     return promise;
   }
 
@@ -481,13 +548,18 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final TimeUnit unit
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeDelayedSync(new ComposeRunnable<>(promise, function, value, true), delay, unit);
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeDelayedSync(
+              new ComposeRunnable<>(promise, function, value, true),
+              delay,
+              unit
+            );
+        }
+      });
     return promise;
   }
 
@@ -497,13 +569,16 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull final Function<? super V, ? extends Promise<U>> function
   ) {
     final var promise = new PromiseImpl<U>();
-    this.future().whenComplete((value, t) -> {
-      if (t != null) {
-        promise.completeExceptionally(t);
-      } else {
-        this.executeSync(new ComposeRunnable<>(promise, function, value, true));
-      }
-    });
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          this.executeSync(
+              new ComposeRunnable<>(promise, function, value, true)
+            );
+        }
+      });
     return promise;
   }
 
@@ -523,11 +598,17 @@ final class PromiseImpl<V> implements Promise<V> {
     Internal.async().execute(runnable);
   }
 
-  private void executeDelayedAsync(@NotNull final Runnable runnable, final long delay, @NotNull final TimeUnit unit) {
+  private void executeDelayedAsync(
+    @NotNull final Runnable runnable,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
     if (delay <= 0) {
       this.executeAsync(runnable);
     } else {
-      Internal.async().schedule(Internal.wrapSchedulerTask(runnable), delay, unit);
+      Internal
+        .async()
+        .schedule(Internal.wrapSchedulerTask(runnable), delay, unit);
     }
   }
 
@@ -548,19 +629,38 @@ final class PromiseImpl<V> implements Promise<V> {
     }
   }
 
-  private void executeDelayedSync(@NotNull final Runnable runnable, final long delay, @NotNull final TimeUnit unit) {
+  private void executeDelayedSync(
+    @NotNull final Runnable runnable,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
     if (delay <= 0) {
       this.executeSync(runnable);
     } else {
-      Bukkit.getScheduler().runTaskLater(Internal.plugin(), Internal.wrapSchedulerTask(runnable), Internal.ticksFrom(delay, unit));
+      Bukkit
+        .getScheduler()
+        .runTaskLater(
+          Internal.plugin(),
+          Internal.wrapSchedulerTask(runnable),
+          Internal.ticksFrom(delay, unit)
+        );
     }
   }
 
-  private void executeDelayedSync(@NotNull final Runnable runnable, final long delayTicks) {
+  private void executeDelayedSync(
+    @NotNull final Runnable runnable,
+    final long delayTicks
+  ) {
     if (delayTicks <= 0) {
       this.executeSync(runnable);
     } else {
-      Bukkit.getScheduler().runTaskLater(Internal.plugin(), Internal.wrapSchedulerTask(runnable), delayTicks);
+      Bukkit
+        .getScheduler()
+        .runTaskLater(
+          Internal.plugin(),
+          Internal.wrapSchedulerTask(runnable),
+          delayTicks
+        );
     }
   }
 
@@ -573,16 +673,18 @@ final class PromiseImpl<V> implements Promise<V> {
   }
 
   private void markAsSupplied() {
-    Preconditions.checkState(this.supplied.compareAndSet(false, true),
-      "Promise is already being supplied.");
+    Preconditions.checkState(
+      this.supplied.compareAndSet(false, true),
+      "Promise is already being supplied."
+    );
   }
 
   private record ApplyRunnable<V, U>(
     @NotNull PromiseImpl<U> promise,
     @NotNull Function<? super V, ? extends U> function,
     @NotNull V value
-  ) implements Runnable {
-
+  )
+    implements Runnable {
     @Override
     public void run() {
       if (this.promise.cancelled.get()) {
@@ -601,8 +703,8 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull Function<? super V, ? extends Promise<U>> function,
     @NotNull V value,
     boolean sync
-  ) implements Runnable {
-
+  )
+    implements Runnable {
     @Override
     public void run() {
       if (this.promise.cancelled.get()) {
@@ -631,7 +733,6 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull Throwable throwable
   )
     implements Runnable {
-
     @Override
     public void run() {
       if (this.promise.cancelled.get()) {
@@ -648,8 +749,8 @@ final class PromiseImpl<V> implements Promise<V> {
   private record SupplyRunnable<V>(
     @NotNull PromiseImpl<V> promise,
     @NotNull Supplier<V> supplier
-  ) implements Runnable {
-
+  )
+    implements Runnable {
     @Override
     public void run() {
       if (this.promise.cancelled.get()) {
@@ -668,7 +769,6 @@ final class PromiseImpl<V> implements Promise<V> {
     @NotNull Callable<V> supplier
   )
     implements Runnable {
-
     @Override
     public void run() {
       if (this.promise.cancelled.get()) {
