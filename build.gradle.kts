@@ -60,6 +60,7 @@ repositories {
 }
 
 dependencies {
+  compileOnly(libs.paper)
   compileOnly(rootProject.libs.terminable)
   compileOnly(rootProject.libs.lombok)
   compileOnly(rootProject.libs.annotations)
@@ -69,8 +70,6 @@ dependencies {
 
   testAnnotationProcessor(rootProject.libs.lombok)
   testAnnotationProcessor(rootProject.libs.annotations)
-
-  compileOnly(libs.paper)
 }
 
 val spotlessApply = rootProject.property("spotless.apply").toString().toBoolean()
