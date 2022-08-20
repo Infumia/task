@@ -7,9 +7,10 @@
 ## How to Use (Developers)
 ### Initiate the Library
 ```java
-final class Plugin {
-  void onLoad() {
-    // Paper
+final class Plugin extends JavaPlugin {
+  @Override
+  public void onLoad() {
+    Tasks.init(this);
   }
 }
 ```
@@ -24,12 +25,7 @@ final class Plugin {
   </dependency>
   <dependency>
     <groupId>tr.com.infumia</groupId>
-    <artifactId>TaskCommon</artifactId>
-    <version>VERSION</version>
-  </dependency>
-  <dependency>
-    <groupId>tr.com.infumia</groupId>
-    <artifactId>TaskPaper</artifactId>
+    <artifactId>task</artifactId>
     <version>VERSION</version>
   </dependency>
 </dependencies>
@@ -43,7 +39,6 @@ plugins {
 dependencies {
   // Do NOT forget to relocate.
   implementation "tr.com.infumia:terminable:VERSION"
-  implementation "tr.com.infumia:TaskCommon:VERSION"
-  implementation "tr.com.infumia:TaskPaper:VERSION"
+  implementation "tr.com.infumia:task:VERSION"
 }
 ```
