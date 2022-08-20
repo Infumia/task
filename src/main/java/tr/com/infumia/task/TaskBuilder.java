@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
  * an interface to determine task builders.
  */
 public interface TaskBuilder {
-
   /**
    * creates a new task builder.
    *
@@ -54,7 +53,6 @@ public interface TaskBuilder {
    * an interface to determine delayed task builders.
    */
   interface Delayed extends ContextualPromiseBuilder {
-
     /**
      * marks that the new task should repeat on the specified interval.
      *
@@ -74,7 +72,10 @@ public interface TaskBuilder {
      * @return a delayed builder.
      */
     @NotNull
-    default ContextualTaskBuilder every(final long duration, @NotNull final TimeUnit unit) {
+    default ContextualTaskBuilder every(
+      final long duration,
+      @NotNull final TimeUnit unit
+    ) {
       return this.every(Internal.ticksFrom(duration, unit));
     }
 
@@ -95,7 +96,6 @@ public interface TaskBuilder {
    * an interface to determine thread contextual task builders.
    */
   interface ThreadContextual {
-
     /**
      * marks that the new task should run after the specified delay.
      *
@@ -150,7 +150,10 @@ public interface TaskBuilder {
      * @return a delayed builder.
      */
     @NotNull
-    default ContextualTaskBuilder afterAndEvery(final long duration, @NotNull final TimeUnit unit) {
+    default ContextualTaskBuilder afterAndEvery(
+      final long duration,
+      @NotNull final TimeUnit unit
+    ) {
       return this.afterAndEvery(Internal.ticksFrom(duration, unit));
     }
 
@@ -162,7 +165,9 @@ public interface TaskBuilder {
      * @return a delayed builder.
      */
     @NotNull
-    default ContextualTaskBuilder afterAndEvery(@NotNull final Duration duration) {
+    default ContextualTaskBuilder afterAndEvery(
+      @NotNull final Duration duration
+    ) {
       return this.afterAndEvery(duration.toMillis(), TimeUnit.MILLISECONDS);
     }
 
@@ -185,7 +190,10 @@ public interface TaskBuilder {
      * @return a delayed builder.
      */
     @NotNull
-    default ContextualTaskBuilder every(final long duration, @NotNull final TimeUnit unit) {
+    default ContextualTaskBuilder every(
+      final long duration,
+      @NotNull final TimeUnit unit
+    ) {
       return this.every(Internal.ticksFrom(duration, unit));
     }
 

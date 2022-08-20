@@ -10,7 +10,6 @@ record TaskBuilderImpl(
   @NotNull ThreadContextual sync
 )
   implements TaskBuilder {
-
   static final TaskBuilder INSTANCE = new TaskBuilderImpl();
 
   private TaskBuilderImpl() {
@@ -22,7 +21,6 @@ record TaskBuilderImpl(
 
   private record ContextualPromiseBuilderImpl(@NotNull ThreadContext context)
     implements ContextualPromiseBuilder {
-
     @NotNull
     @Override
     public <T> Promise<T> call(@NotNull final Callable<T> callable) {
@@ -48,7 +46,6 @@ record TaskBuilderImpl(
     long interval
   )
     implements ContextualTaskBuilder {
-
     @NotNull
     @Override
     public Task consume(@NotNull final Consumer<Task> consumer) {
@@ -68,7 +65,6 @@ record TaskBuilderImpl(
 
   private record DelayedBuilder(@NotNull ThreadContext context, long delay)
     implements TaskBuilder.Delayed {
-
     @NotNull
     @Override
     public <T> Promise<T> call(@NotNull final Callable<T> callable) {
@@ -99,7 +95,6 @@ record TaskBuilderImpl(
     @NotNull ContextualPromiseBuilder instant
   )
     implements TaskBuilder.ThreadContextual {
-
     private ThreadContextualBuilder(@NotNull final ThreadContext context) {
       this(context, new ContextualPromiseBuilderImpl(context));
     }

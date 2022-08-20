@@ -2,7 +2,6 @@ package tr.com.infumia.task;
 
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
-import tr.com.infumia.task.Task;
 
 /**
  * an interface to determine contextual task builders.

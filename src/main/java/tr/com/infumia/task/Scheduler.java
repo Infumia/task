@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
  * an interface to determine schedulers.
  */
 public interface Scheduler extends Executor {
-
   @NotNull
   default <T> Promise<T> call(@NotNull final Callable<T> callable) {
     return Promise.supplying(
@@ -105,10 +104,10 @@ public interface Scheduler extends Executor {
     @NotNull final TimeUnit intervalUnit
   ) {
     return this.runRepeating(
-      consumer,
-      Internal.ticksFrom(delay, delayUnit),
-      Internal.ticksFrom(interval, intervalUnit)
-    );
+        consumer,
+        Internal.ticksFrom(delay, delayUnit),
+        Internal.ticksFrom(interval, intervalUnit)
+      );
   }
 
   @NotNull
@@ -117,7 +116,13 @@ public interface Scheduler extends Executor {
     @NotNull final Duration delay,
     @NotNull final Duration interval
   ) {
-    return this.runRepeating(consumer, delay.toMillis(), TimeUnit.MICROSECONDS, interval.toMillis(), TimeUnit.MICROSECONDS);
+    return this.runRepeating(
+        consumer,
+        delay.toMillis(),
+        TimeUnit.MICROSECONDS,
+        interval.toMillis(),
+        TimeUnit.MICROSECONDS
+      );
   }
 
   @NotNull
@@ -127,10 +132,10 @@ public interface Scheduler extends Executor {
     final long intervalTicks
   ) {
     return this.runRepeating(
-      Internal.runnableToConsumer(runnable),
-      delayTicks,
-      intervalTicks
-    );
+        Internal.runnableToConsumer(runnable),
+        delayTicks,
+        intervalTicks
+      );
   }
 
   @NotNull
@@ -142,12 +147,12 @@ public interface Scheduler extends Executor {
     @NotNull final TimeUnit intervalUnit
   ) {
     return this.runRepeating(
-      Internal.runnableToConsumer(runnable),
-      delay,
-      delayUnit,
-      interval,
-      intervalUnit
-    );
+        Internal.runnableToConsumer(runnable),
+        delay,
+        delayUnit,
+        interval,
+        intervalUnit
+      );
   }
 
   @NotNull
@@ -156,7 +161,13 @@ public interface Scheduler extends Executor {
     @NotNull final Duration delay,
     @NotNull final Duration interval
   ) {
-    return this.runRepeating(runnable, delay.toMillis(), TimeUnit.MICROSECONDS, interval.toMillis(), TimeUnit.MICROSECONDS);
+    return this.runRepeating(
+        runnable,
+        delay.toMillis(),
+        TimeUnit.MICROSECONDS,
+        interval.toMillis(),
+        TimeUnit.MICROSECONDS
+      );
   }
 
   @NotNull

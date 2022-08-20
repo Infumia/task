@@ -3,7 +3,6 @@ package tr.com.infumia.task;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
-import tr.com.infumia.task.Promise;
 
 /**
  * an interface to determine contextual promise builders.

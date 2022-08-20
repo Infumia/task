@@ -101,16 +101,12 @@ class Internal {
   }
 
   @NotNull
-  static <T> Consumer<T> runnableToConsumer(
-    @NotNull final Runnable runnable
-  ) {
+  static <T> Consumer<T> runnableToConsumer(@NotNull final Runnable runnable) {
     return new RunnableToConsumer<>(runnable);
   }
 
   @NotNull
-  static Supplier<Void> runnableToSupplier(
-    @NotNull final Runnable runnable
-  ) {
+  static Supplier<Void> runnableToSupplier(@NotNull final Runnable runnable) {
     return new RunnableToSupplier<>(runnable);
   }
 
@@ -188,12 +184,12 @@ class Internal {
         }
       };
       return this.consumeTask(
-        this.timerExecutionService.schedule(
-          () -> this.executorService.execute(delegate),
-          delay,
-          unit
-        )
-      );
+          this.timerExecutionService.schedule(
+              () -> this.executorService.execute(delegate),
+              delay,
+              unit
+            )
+        );
     }
 
     @Override
@@ -214,13 +210,13 @@ class Internal {
       @NotNull final TimeUnit unit
     ) {
       return this.consumeTask(
-        this.timerExecutionService.scheduleAtFixedRate(
-          new FixedRateWorker(Internal.wrapSchedulerTask(command), this),
-          initialDelay,
-          period,
-          unit
-        )
-      );
+          this.timerExecutionService.scheduleAtFixedRate(
+              new FixedRateWorker(Internal.wrapSchedulerTask(command), this),
+              initialDelay,
+              period,
+              unit
+            )
+        );
     }
 
     @NotNull
@@ -235,8 +231,7 @@ class Internal {
     }
 
     @Override
-    public void shutdown() {
-    }
+    public void shutdown() {}
 
     @NotNull
     @Override
@@ -303,14 +298,14 @@ class Internal {
           return;
         }
         this.executor.executorService.execute(() -> {
-          this.lock.lock();
-          try {
-            this.delegate.run();
-          } finally {
-            this.lock.unlock();
-            this.running.decrementAndGet();
-          }
-        });
+            this.lock.lock();
+            try {
+              this.delegate.run();
+            } finally {
+              this.lock.unlock();
+              this.running.decrementAndGet();
+            }
+          });
       }
     }
   }
@@ -373,7 +368,6 @@ class Internal {
 
   private record CallableToSupplier<T>(@NotNull Callable<T> delegate)
     implements Supplier<T> {
-
     @Override
     public T get() {
       try {
@@ -383,65 +377,6 @@ class Internal {
       } catch (final Exception e) {
         throw new RuntimeException(e);
       }
-    }
-  }
-
-  private record RunnableToConsumer<T>(@NotNull Runnable delegate)
-    implements Consumer<T> {
-
-    @Override
-    public void accept(final T t) {
-      this.delegate.run();
-    }
-  }
-
-  private record RunnableToSupplier<T>(@NotNull Runnable delegate)
-    implements Supplier<@Nullable T> {
-
-    @Nullable
-    @Override
-    public T get() {
-      this.delegate.run();
-      return null;
-    }
-  }
-
-  private record SchedulerWrappedRunnable(@NotNull Runnable delegate)
-    implements Runnable {
-
-    @Override
-    public void run() {
-      try {
-        this.delegate.run();
-      } catch (final Throwable t) {
-        t.printStackTrace();
-      }
-    }
-  }
-
-  static final class SyncScheduler implements Scheduler {
-
-    @NotNull
-    @Override
-    public ThreadContext context() {
-      return ThreadContext.SYNC;
-    }
-
-    @NotNull
-    @Override
-    public Task runRepeating(
-      @NotNull final Consumer<Task> consumer,
-      final long delayTicks,
-      final long intervalTicks
-    ) {
-      final var task = new InternalTask(consumer);
-      task.runTaskTimer(Internal.plugin(), delayTicks, intervalTicks);
-      return task;
-    }
-
-    @Override
-    public void execute(@NotNull final Runnable command) {
-      Internal.syncBukkit().execute(command);
     }
   }
 
@@ -493,6 +428,62 @@ class Internal {
       if (this.cancelled.get()) {
         this.cancel();
       }
+    }
+  }
+
+  private record RunnableToConsumer<T>(@NotNull Runnable delegate)
+    implements Consumer<T> {
+    @Override
+    public void accept(final T t) {
+      this.delegate.run();
+    }
+  }
+
+  private record RunnableToSupplier<T>(@NotNull Runnable delegate)
+    implements Supplier<@Nullable T> {
+    @Nullable
+    @Override
+    public T get() {
+      this.delegate.run();
+      return null;
+    }
+  }
+
+  private record SchedulerWrappedRunnable(@NotNull Runnable delegate)
+    implements Runnable {
+    @Override
+    public void run() {
+      try {
+        this.delegate.run();
+      } catch (final Throwable t) {
+        t.printStackTrace();
+      }
+    }
+  }
+
+  static final class SyncScheduler implements Scheduler {
+
+    @NotNull
+    @Override
+    public ThreadContext context() {
+      return ThreadContext.SYNC;
+    }
+
+    @NotNull
+    @Override
+    public Task runRepeating(
+      @NotNull final Consumer<Task> consumer,
+      final long delayTicks,
+      final long intervalTicks
+    ) {
+      final var task = new InternalTask(consumer);
+      task.runTaskTimer(Internal.plugin(), delayTicks, intervalTicks);
+      return task;
+    }
+
+    @Override
+    public void execute(@NotNull final Runnable command) {
+      Internal.syncBukkit().execute(command);
     }
   }
 }
