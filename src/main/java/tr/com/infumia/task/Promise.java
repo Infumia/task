@@ -375,6 +375,9 @@ public interface Promise<V> extends Future<V>, Terminable {
   }
 
   @NotNull
+  Promise<V> printExceptions();
+
+  @NotNull
   Promise<V> supply(@Nullable V value);
 
   @NotNull

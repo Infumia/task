@@ -178,6 +178,18 @@ final class PromiseImpl<V> implements Promise<V> {
 
   @NotNull
   @Override
+  public Promise<V> printExceptions() {
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          t.printStackTrace();
+        }
+      });
+    return this;
+  }
+
+  @NotNull
+  @Override
   public PromiseImpl<V> supply(@Nullable final V value) {
     this.markAsSupplied();
     this.complete(value);
