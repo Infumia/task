@@ -14,8 +14,8 @@ record TaskBuilderImpl(
 
   private TaskBuilderImpl() {
     this(
-      new ThreadContextualBuilder(ThreadContext.SYNC),
-      new ThreadContextualBuilder(ThreadContext.ASYNC)
+      new ThreadContextualBuilder(ThreadContext.ASYNC),
+      new ThreadContextualBuilder(ThreadContext.SYNC)
     );
   }
 
