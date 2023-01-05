@@ -5,10 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
-record TaskBuilderImpl(
-  @NotNull ThreadContextual async,
-  @NotNull ThreadContextual sync
-)
+record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextual sync)
   implements TaskBuilder {
   static final TaskBuilder INSTANCE = new TaskBuilderImpl();
 
@@ -49,17 +46,13 @@ record TaskBuilderImpl(
     @NotNull
     @Override
     public Task consume(@NotNull final Consumer<Task> consumer) {
-      return Schedulers
-        .get(this.context)
-        .runRepeating(consumer, this.delay, this.interval);
+      return Schedulers.get(this.context).runRepeating(consumer, this.delay, this.interval);
     }
 
     @NotNull
     @Override
     public Task run(@NotNull final Runnable runnable) {
-      return Schedulers
-        .get(this.context)
-        .runRepeating(runnable, this.delay, this.interval);
+      return Schedulers.get(this.context).runRepeating(runnable, this.delay, this.interval);
     }
   }
 
