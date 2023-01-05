@@ -12,16 +12,10 @@ plugins {
 
 group = "tr.com.infumia"
 
-java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(17))
-  }
-}
+java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
 
 tasks {
-  compileJava {
-    options.encoding = Charsets.UTF_8.name()
-  }
+  compileJava { options.encoding = Charsets.UTF_8.name() }
 
   jar {
     archiveClassifier.set(null as String?)
@@ -33,19 +27,21 @@ tasks {
     (options as StandardJavadocDocletOptions).tags("todo")
   }
 
-  val javadocJar by creating(Jar::class) {
-    dependsOn("javadoc")
-    archiveClassifier.set("javadoc")
-    archiveVersion.set(project.version.toString())
-    from(javadoc)
-  }
+  val javadocJar by
+      creating(Jar::class) {
+        dependsOn("javadoc")
+        archiveClassifier.set("javadoc")
+        archiveVersion.set(project.version.toString())
+        from(javadoc)
+      }
 
-  val sourcesJar by creating(Jar::class) {
-    dependsOn("classes")
-    archiveClassifier.set("sources")
-    archiveVersion.set(project.version.toString())
-    from(sourceSets["main"].allSource)
-  }
+  val sourcesJar by
+      creating(Jar::class) {
+        dependsOn("classes")
+        archiveClassifier.set("sources")
+        archiveVersion.set(project.version.toString())
+        from(sourceSets["main"].allSource)
+      }
 
   build {
     dependsOn(jar)
@@ -82,27 +78,28 @@ if (spotlessApply) {
     format("encoding") {
       target("*.*")
       encoding("UTF-8")
+      endWithNewline()
+      trimTrailingWhitespace()
+    }
+
+    kotlinGradle {
+      target("**/*.gradle.kts")
+      endWithNewline()
+      indentWithSpaces(2)
+      trimTrailingWhitespace()
+      ktfmt("0.42")
     }
 
     java {
-      target("**/src/main/java/**/*.java")
+      target("**/src/**/java/**/*.java")
       importOrder()
       removeUnusedImports()
       endWithNewline()
       indentWithSpaces(2)
       trimTrailingWhitespace()
-      prettier(
-        mapOf(
-          "prettier" to "2.7.1",
-          "prettier-plugin-java" to "1.6.2"
-        )
-      ).config(
-        mapOf(
-          "parser" to "java",
-          "tabWidth" to 2,
-          "useTabs" to false
-        )
-      )
+      prettier(mapOf("prettier" to "2.7.1", "prettier-plugin-java" to "1.6.2"))
+          .config(
+              mapOf("parser" to "java", "tabWidth" to 2, "useTabs" to false, "printWidth" to 100))
     }
   }
 }
@@ -111,38 +108,39 @@ val signRequired = !rootProject.property("dev").toString().toBoolean()
 
 publishing {
   publications {
-    val publication = create<MavenPublication>("mavenJava") {
-      groupId = project.group.toString()
-      artifactId = project.name
-      version = project.version.toString()
+    val publication =
+        create<MavenPublication>("mavenJava") {
+          groupId = project.group.toString()
+          artifactId = project.name
+          version = project.version.toString()
 
-      from(components["java"])
-      artifact(tasks["sourcesJar"])
-      artifact(tasks["javadocJar"])
-      pom {
-        name.set("Event")
-        description.set("A simple builder-like task organizer library for Paper.")
-        url.set("https://infumia.com.tr/")
-        licenses {
-          license {
-            name.set("MIT License")
-            url.set("https://mit-license.org/license.txt")
+          from(components["java"])
+          artifact(tasks["sourcesJar"])
+          artifact(tasks["javadocJar"])
+          pom {
+            name.set("Event")
+            description.set("A simple builder-like task organizer library for Paper.")
+            url.set("https://infumia.com.tr/")
+            licenses {
+              license {
+                name.set("MIT License")
+                url.set("https://mit-license.org/license.txt")
+              }
+            }
+            developers {
+              developer {
+                id.set("portlek")
+                name.set("Hasan Demirtaş")
+                email.set("utsukushihito@outlook.com")
+              }
+            }
+            scm {
+              connection.set("scm:git:git://github.com/infumia/task.git")
+              developerConnection.set("scm:git:ssh://github.com/infumia/task.git")
+              url.set("https://github.com/infumia/task")
+            }
           }
         }
-        developers {
-          developer {
-            id.set("portlek")
-            name.set("Hasan Demirtaş")
-            email.set("utsukushihito@outlook.com")
-          }
-        }
-        scm {
-          connection.set("scm:git:git://github.com/infumia/task.git")
-          developerConnection.set("scm:git:ssh://github.com/infumia/task.git")
-          url.set("https://github.com/infumia/task")
-        }
-      }
-    }
 
     signing {
       isRequired = signRequired
@@ -154,8 +152,4 @@ publishing {
   }
 }
 
-nexusPublishing {
-  repositories {
-    sonatype()
-  }
-}
+nexusPublishing { repositories { sonatype() } }
