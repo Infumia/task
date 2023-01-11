@@ -22,7 +22,7 @@ final class BukkitSyncScheduler implements Scheduler {
   public Promise<Void> run(@NotNull final Runnable runnable) {
     final var promise = new PromiseImpl<Void>();
     final var plugin = BukkitTasks.plugin();
-    final var task = new InternalBukkitTask(t -> {
+    final var task = new BukkitInternalTask(t -> {
       new PromiseSupply<>(promise, new RunnableToSupplier<>(runnable)).run();
       return false;
     });
@@ -44,7 +44,7 @@ final class BukkitSyncScheduler implements Scheduler {
   public Promise<Void> runLater(@NotNull final Runnable runnable, final long delayTicks) {
     final var promise = new PromiseImpl<Void>();
     final var plugin = BukkitTasks.plugin();
-    final var task = new InternalBukkitTask(t -> {
+    final var task = new BukkitInternalTask(t -> {
       new PromiseSupply<>(promise, new RunnableToSupplier<>(runnable)).run();
       return false;
     });
@@ -65,7 +65,7 @@ final class BukkitSyncScheduler implements Scheduler {
     final long intervalTicks
   ) {
     final var plugin = BukkitTasks.plugin();
-    final var task = new InternalBukkitTask(taskPredicate);
+    final var task = new BukkitInternalTask(taskPredicate);
     if (plugin.isEnabled()) {
       task.runTaskTimer(plugin, delayTicks, intervalTicks);
     } else {
