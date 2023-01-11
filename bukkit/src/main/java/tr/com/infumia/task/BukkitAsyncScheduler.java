@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-final class AsyncScheduler implements Scheduler {
+final class BukkitAsyncScheduler implements Scheduler {
 
   @NotNull
   @Override
@@ -50,13 +50,13 @@ final class AsyncScheduler implements Scheduler {
     final long delayTicks,
     final long intervalTicks
   ) {
-    final var plugin = Tasks.plugin();
+    final var plugin = BukkitTasks.plugin();
     final var task = new InternalBukkitTask(taskPredicate);
     if (plugin.isEnabled()) {
       task.runTaskTimerAsynchronously(plugin, delayTicks, intervalTicks);
     } else {
-      AsyncScheduler.log.error("Plugin attempted to register task while disabled!");
-      AsyncScheduler.log.error("The task won't be run because this is a repeating task!");
+      BukkitAsyncScheduler.log.error("Plugin attempted to register task while disabled!");
+      BukkitAsyncScheduler.log.error("The task won't be run because this is a repeating task!");
     }
     return task;
   }

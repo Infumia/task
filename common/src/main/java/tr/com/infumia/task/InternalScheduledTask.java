@@ -1,6 +1,5 @@
 package tr.com.infumia.task;
 
-import com.google.common.base.Preconditions;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,9 +35,12 @@ final class InternalScheduledTask implements InternalTask {
 
   @Override
   public void cancel() {
-    Preconditions
-      .checkNotNull(this.task, "Initiate the task using #scheduleAtFixedRate(long, long, TimeUnit)")
-      .cancel(false);
+    if (this.task == null) {
+      throw new IllegalStateException(
+        "Initiate the task using #scheduleAtFixedRate(long, long, TimeUnit)"
+      );
+    }
+    this.task.cancel(false);
   }
 
   @Override

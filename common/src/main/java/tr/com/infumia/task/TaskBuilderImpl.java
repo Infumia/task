@@ -21,19 +21,19 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     @NotNull
     @Override
     public <T> Promise<T> call(@NotNull final Callable<T> callable) {
-      return Schedulers.get(this.context).call(callable);
+      return Internal.get(this.context).call(callable);
     }
 
     @NotNull
     @Override
     public Promise<Void> run(@NotNull final Runnable runnable) {
-      return Schedulers.get(this.context).run(runnable);
+      return Internal.get(this.context).run(runnable);
     }
 
     @NotNull
     @Override
     public <T> Promise<T> supply(@NotNull final Supplier<T> supplier) {
-      return Schedulers.get(this.context).supply(supplier);
+      return Internal.get(this.context).supply(supplier);
     }
   }
 
@@ -46,13 +46,13 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     @NotNull
     @Override
     public Task consume(@NotNull final Consumer<Task> consumer) {
-      return Schedulers.get(this.context).runRepeating(consumer, this.delay, this.interval);
+      return Internal.get(this.context).runRepeating(consumer, this.delay, this.interval);
     }
 
     @NotNull
     @Override
     public Task run(@NotNull final Runnable runnable) {
-      return Schedulers.get(this.context).runRepeating(runnable, this.delay, this.interval);
+      return Internal.get(this.context).runRepeating(runnable, this.delay, this.interval);
     }
   }
 
@@ -61,19 +61,19 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     @NotNull
     @Override
     public <T> Promise<T> call(@NotNull final Callable<T> callable) {
-      return Schedulers.get(this.context).callLater(callable, this.delay);
+      return Internal.get(this.context).callLater(callable, this.delay);
     }
 
     @NotNull
     @Override
     public Promise<Void> run(@NotNull final Runnable runnable) {
-      return Schedulers.get(this.context).runLater(runnable, this.delay);
+      return Internal.get(this.context).runLater(runnable, this.delay);
     }
 
     @NotNull
     @Override
     public <T> Promise<T> supply(@NotNull final Supplier<T> supplier) {
-      return Schedulers.get(this.context).supplyLater(supplier, this.delay);
+      return Internal.get(this.context).supplyLater(supplier, this.delay);
     }
 
     @NotNull

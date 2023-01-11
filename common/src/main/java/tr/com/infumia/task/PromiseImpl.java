@@ -1,6 +1,5 @@
 package tr.com.infumia.task;
 
-import com.google.common.base.Preconditions;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -154,9 +153,8 @@ final class PromiseImpl<V> implements Promise<V> {
   }
 
   private void markAsSupplied() {
-    Preconditions.checkState(
-      this.supplied.compareAndSet(false, true),
-      "Promise is already being supplied."
-    );
+    if (this.supplied.compareAndSet(true, true)) {
+      throw new IllegalStateException("Promise is already being supplied.");
+    }
   }
 }

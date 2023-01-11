@@ -10,65 +10,10 @@ plugins {
   id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
-group = "tr.com.infumia"
-
-java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
-
-tasks {
-  compileJava { options.encoding = Charsets.UTF_8.name() }
-
-  jar {
-    archiveClassifier.set(null as String?)
-    archiveVersion.set(project.version.toString())
-  }
-
-  javadoc {
-    options.encoding = Charsets.UTF_8.name()
-    (options as StandardJavadocDocletOptions).tags("todo")
-  }
-
-  val javadocJar by
-      creating(Jar::class) {
-        dependsOn("javadoc")
-        archiveClassifier.set("javadoc")
-        archiveVersion.set(project.version.toString())
-        from(javadoc)
-      }
-
-  val sourcesJar by
-      creating(Jar::class) {
-        dependsOn("classes")
-        archiveClassifier.set("sources")
-        archiveVersion.set(project.version.toString())
-        from(sourceSets["main"].allSource)
-      }
-
-  build {
-    dependsOn(jar)
-    dependsOn(sourcesJar)
-    dependsOn(javadocJar)
-  }
-}
-
-repositories {
-  mavenCentral()
-  maven("https://papermc.io/repo/repository/maven-public/")
-}
-
-dependencies {
-  compileOnly(libs.paper)
-  compileOnly(rootProject.libs.terminable)
-  compileOnly(rootProject.libs.lombok)
-  compileOnly(rootProject.libs.annotations)
-
-  annotationProcessor(rootProject.libs.lombok)
-  annotationProcessor(rootProject.libs.annotations)
-
-  testAnnotationProcessor(rootProject.libs.lombok)
-  testAnnotationProcessor(rootProject.libs.annotations)
-}
-
+val signRequired = !rootProject.property("dev").toString().toBoolean()
 val spotlessApply = rootProject.property("spotless.apply").toString().toBoolean()
+
+repositories { mavenCentral() }
 
 if (spotlessApply) {
   configure<SpotlessExtension> {
@@ -104,49 +49,119 @@ if (spotlessApply) {
   }
 }
 
-val signRequired = !rootProject.property("dev").toString().toBoolean()
+allprojects { group = "tr.com.infumia" }
 
-publishing {
-  publications {
-    val publication =
-        create<MavenPublication>("mavenJava") {
-          groupId = project.group.toString()
-          artifactId = project.name
-          version = project.version.toString()
+subprojects {
+  apply<JavaPlugin>()
+  apply<JavaLibraryPlugin>()
+  apply<MavenPublishPlugin>()
+  apply<SigningPlugin>()
 
-          from(components["java"])
-          artifact(tasks["sourcesJar"])
-          artifact(tasks["javadocJar"])
-          pom {
-            name.set("Event")
-            description.set("A simple builder-like task organizer library for Paper.")
-            url.set("https://infumia.com.tr/")
-            licenses {
-              license {
-                name.set("MIT License")
-                url.set("https://mit-license.org/license.txt")
-              }
-            }
-            developers {
-              developer {
-                id.set("portlek")
-                name.set("Hasan Demirtaş")
-                email.set("utsukushihito@outlook.com")
-              }
-            }
-            scm {
-              connection.set("scm:git:git://github.com/infumia/task.git")
-              developerConnection.set("scm:git:ssh://github.com/infumia/task.git")
-              url.set("https://github.com/infumia/task")
-            }
-          }
+  val projectName = property("project.name").toString()
+
+  java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
+
+  tasks {
+    compileJava { options.encoding = Charsets.UTF_8.name() }
+
+    jar {
+      archiveClassifier.set(null as String?)
+      archiveBaseName.set(projectName)
+      archiveVersion.set(project.version.toString())
+    }
+
+    javadoc {
+      options.encoding = Charsets.UTF_8.name()
+      (options as StandardJavadocDocletOptions).tags("todo")
+    }
+
+    val javadocJar by
+        creating(Jar::class) {
+          dependsOn("javadoc")
+          archiveClassifier.set("javadoc")
+          archiveBaseName.set(projectName)
+          archiveVersion.set(project.version.toString())
+          from(javadoc)
         }
 
-    signing {
-      isRequired = signRequired
-      if (isRequired) {
-        useGpgCmd()
-        sign(publication)
+    val sourcesJar by
+        creating(Jar::class) {
+          dependsOn("classes")
+          archiveClassifier.set("sources")
+          archiveBaseName.set(projectName)
+          archiveVersion.set(project.version.toString())
+          from(sourceSets["main"].allSource)
+        }
+
+    build {
+      dependsOn(jar)
+      dependsOn(sourcesJar)
+      dependsOn(javadocJar)
+    }
+  }
+
+  repositories {
+    mavenCentral()
+    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://repo.dmulloy2.net/repository/public/")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
+    mavenLocal()
+  }
+
+  dependencies {
+    compileOnly(rootProject.libs.terminable)
+    compileOnly(rootProject.libs.lombok)
+    compileOnly(rootProject.libs.annotations)
+
+    annotationProcessor(rootProject.libs.lombok)
+    annotationProcessor(rootProject.libs.annotations)
+
+    testAnnotationProcessor(rootProject.libs.lombok)
+    testAnnotationProcessor(rootProject.libs.annotations)
+  }
+
+  publishing {
+    publications {
+      val publication =
+          create<MavenPublication>("mavenJava") {
+            groupId = project.group.toString()
+            artifactId = projectName
+            version = project.version.toString()
+
+            from(components["java"])
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+            pom {
+              name.set(projectName)
+              description.set("A simple builder-like task organizer library for Paper.")
+              url.set("https://infumia.com.tr/")
+              licenses {
+                license {
+                  name.set("MIT License")
+                  url.set("https://mit-license.org/license.txt")
+                }
+              }
+              developers {
+                developer {
+                  id.set("portlek")
+                  name.set("Hasan Demirtaş")
+                  email.set("utsukushihito@outlook.com")
+                }
+              }
+              scm {
+                connection.set("scm:git:git://github.com/infumia/task.git")
+                developerConnection.set("scm:git:ssh://github.com/infumia/task.git")
+                url.set("https://github.com/infumia/task")
+              }
+            }
+          }
+
+      signing {
+        isRequired = signRequired
+        if (isRequired) {
+          useGpgCmd()
+          sign(publication)
+        }
       }
     }
   }
