@@ -51,7 +51,7 @@ final class BukkitAsyncScheduler implements Scheduler {
     final long intervalTicks
   ) {
     final var plugin = BukkitTasks.plugin();
-    final var task = new InternalBukkitTask(taskPredicate);
+    final var task = new BukkitInternalTask(taskPredicate);
     if (plugin.isEnabled()) {
       task.runTaskTimerAsynchronously(plugin, delayTicks, intervalTicks);
     } else {

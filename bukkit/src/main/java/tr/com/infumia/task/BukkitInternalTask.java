@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-final class InternalBukkitTask extends BukkitRunnable implements InternalTask {
+final class BukkitInternalTask extends BukkitRunnable implements InternalTask {
 
   @NotNull
   Predicate<Task> backingTask;
