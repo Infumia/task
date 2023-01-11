@@ -125,7 +125,7 @@ subprojects {
       val publication =
           create<MavenPublication>("mavenJava") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = projectName
             version = project.version.toString()
 
             from(components["java"])
