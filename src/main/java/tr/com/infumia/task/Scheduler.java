@@ -2,12 +2,10 @@ package tr.com.infumia.task;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
@@ -46,7 +44,13 @@ public interface Scheduler {
   Promise<Void> run(@NotNull Runnable runnable);
 
   @NotNull
-  Promise<Void> runLater(@NotNull Runnable runnable, long delay, @NotNull TimeUnit unit);
+  default Promise<Void> runLater(
+    @NotNull final Runnable runnable,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
+    return this.runLater(runnable, Internal.ticksFrom(delay, unit));
+  }
 
   @NotNull
   default Promise<Void> runLater(@NotNull final Runnable runnable, @NotNull final Duration delay) {
@@ -56,44 +60,6 @@ public interface Scheduler {
   @NotNull
   default Promise<Void> runLater(@NotNull final Runnable runnable, final long delayTicks) {
     return this.runLater(runnable, Duration.ofMillis(Internal.ticksToMs(delayTicks)));
-  }
-
-  /**
-   * @see BukkitRunnable
-   */
-  @NotNull
-  Task runRepeatingCloseIf(
-    @NotNull Predicate<Task> taskPredicate,
-    long delayTicks,
-    long intervalTicks
-  );
-
-  @NotNull
-  default Task runRepeatingCloseIf(
-    @NotNull final Predicate<Task> taskPredicate,
-    final long delay,
-    @NotNull final TimeUnit delayUnit,
-    final long interval,
-    @NotNull final TimeUnit intervalUnit
-  ) {
-    return this.runRepeatingCloseIf(
-        taskPredicate,
-        Internal.ticksFrom(delay, delayUnit),
-        Internal.ticksFrom(interval, intervalUnit)
-      );
-  }
-
-  @NotNull
-  default Task runRepeatingCloseIf(
-    @NotNull final Predicate<Task> taskPredicate,
-    @NotNull final Duration delay,
-    @NotNull final Duration interval
-  ) {
-    return this.runRepeatingCloseIf(
-        taskPredicate,
-        Internal.ticksFrom(delay),
-        Internal.ticksFrom(interval)
-      );
   }
 
   @NotNull
@@ -166,9 +132,41 @@ public interface Scheduler {
     return this.runRepeating(runnable, Internal.ticksFrom(delay), Internal.ticksFrom(interval));
   }
 
-  /**
-   * @see ScheduledExecutorService
-   */
+  @NotNull
+  Task runRepeatingCloseIf(
+    @NotNull Predicate<Task> taskPredicate,
+    long delayTicks,
+    long intervalTicks
+  );
+
+  @NotNull
+  default Task runRepeatingCloseIf(
+    @NotNull final Predicate<Task> taskPredicate,
+    final long delay,
+    @NotNull final TimeUnit delayUnit,
+    final long interval,
+    @NotNull final TimeUnit intervalUnit
+  ) {
+    return this.runRepeatingCloseIf(
+        taskPredicate,
+        Internal.ticksFrom(delay, delayUnit),
+        Internal.ticksFrom(interval, intervalUnit)
+      );
+  }
+
+  @NotNull
+  default Task runRepeatingCloseIf(
+    @NotNull final Predicate<Task> taskPredicate,
+    @NotNull final Duration delay,
+    @NotNull final Duration interval
+  ) {
+    return this.runRepeatingCloseIf(
+        taskPredicate,
+        Internal.ticksFrom(delay),
+        Internal.ticksFrom(interval)
+      );
+  }
+
   @NotNull
   Task scheduleRepeating(
     @NotNull Predicate<Task> taskPredicate,

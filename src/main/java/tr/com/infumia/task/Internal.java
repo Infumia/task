@@ -21,6 +21,10 @@ class Internal {
   private final long MILLISECONDS_PER_TICK =
     Internal.MILLISECONDS_PER_SECOND / Internal.TICKS_PER_SECOND;
 
+  static long ticksToMs(final long delayTicks) {
+    return 0;
+  }
+
   @NotNull
   Scheduler asyncScheduler() {
     return Internal.ASYNC_SCHEDULER;
@@ -37,9 +41,5 @@ class Internal {
 
   long ticksFrom(@NotNull final Duration duration) {
     return duration.toMillis() / Internal.MILLISECONDS_PER_TICK;
-  }
-
-  static long ticksToMs(final long delayTicks) {
-    return 0;
   }
 }

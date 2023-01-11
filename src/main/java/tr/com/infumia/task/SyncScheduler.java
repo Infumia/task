@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 @Log4j2
@@ -23,9 +22,12 @@ final class SyncScheduler implements Scheduler {
   public Promise<Void> run(@NotNull final Runnable runnable) {
     final var promise = new PromiseImpl<Void>();
     final var plugin = Tasks.plugin();
-    final var task = new PromiseSupply<>(promise, new RunnableToSupplier<>(runnable));
+    final var task = new InternalBukkitTask(t -> {
+      new PromiseSupply<>(promise, new RunnableToSupplier<>(runnable)).run();
+      return false;
+    });
     if (plugin.isEnabled()) {
-      Bukkit.getScheduler().runTask(plugin, task);
+      task.runTask(plugin);
     } else {
       SyncScheduler.log.error("Plugin attempted to register task while disabled!");
       SyncScheduler.log.error(
@@ -39,22 +41,15 @@ final class SyncScheduler implements Scheduler {
 
   @NotNull
   @Override
-  public Promise<Void> runLater(
-    @NotNull final Runnable runnable,
-    final long delay,
-    @NotNull final TimeUnit unit
-  ) {
-    return this.runLater(runnable, Internal.ticksFrom(delay, unit));
-  }
-
-  @NotNull
-  @Override
   public Promise<Void> runLater(@NotNull final Runnable runnable, final long delayTicks) {
     final var promise = new PromiseImpl<Void>();
     final var plugin = Tasks.plugin();
-    final var task = new PromiseSupply<>(promise, new RunnableToSupplier<>(runnable));
+    final var task = new InternalBukkitTask(t -> {
+      new PromiseSupply<>(promise, new RunnableToSupplier<>(runnable)).run();
+      return false;
+    });
     if (plugin.isEnabled()) {
-      Bukkit.getScheduler().runTaskLater(plugin, task, delayTicks);
+      task.runTaskLater(plugin, delayTicks);
     } else {
       SyncScheduler.log.error("Plugin attempted to register task while disabled!");
       SyncScheduler.log.error("The task won't be run because this is a repeating task!");
