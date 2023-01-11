@@ -10,7 +10,7 @@
 final class Plugin extends JavaPlugin {
   @Override
   public void onLoad() {
-    Tasks.init(this);
+    BukkitTasks.init(this);
   }
 }
 ```
@@ -25,7 +25,12 @@ final class Plugin extends JavaPlugin {
   </dependency>
   <dependency>
     <groupId>tr.com.infumia</groupId>
-    <artifactId>task</artifactId>
+    <artifactId>TaskCommon</artifactId>
+    <version>VERSION</version>
+  </dependency>
+  <dependency>
+    <groupId>tr.com.infumia</groupId>
+    <artifactId>TaskBukkit</artifactId>
     <version>VERSION</version>
   </dependency>
 </dependencies>
@@ -39,6 +44,7 @@ plugins {
 dependencies {
   // Do NOT forget to relocate.
   implementation "tr.com.infumia:terminable:VERSION"
-  implementation "tr.com.infumia:task:VERSION"
+  implementation "tr.com.infumia:TaskCommon:VERSION"
+  implementation "tr.com.infumia:TaskBukkit:VERSION"
 }
 ```

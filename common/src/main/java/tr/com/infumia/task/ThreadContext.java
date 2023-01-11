@@ -14,6 +14,6 @@ public enum ThreadContext {
 
   @NotNull
   public static ThreadContext forThread(@NotNull final Thread thread) {
-    return Tasks.mainThread().equals(thread) ? ThreadContext.SYNC : ThreadContext.ASYNC;
+    return Internal.mainThread().equals(thread) ? ThreadContext.SYNC : ThreadContext.ASYNC;
   }
 }
