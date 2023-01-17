@@ -27,12 +27,12 @@ public interface TaskBuilder {
   interface Delayed extends ContextualPromiseBuilder {
     @NotNull
     default ContextualTaskBuilder every(final long ticks) {
-      return this.every(Internal.durationFrom(ticks));
+      return this.every(Times.durationFrom(ticks));
     }
 
     @NotNull
     default ContextualTaskBuilder every(final long duration, @NotNull final TimeUnit unit) {
-      return this.every(Internal.durationFrom(duration, unit));
+      return this.every(Times.durationFrom(duration, unit));
     }
 
     @NotNull
@@ -42,12 +42,12 @@ public interface TaskBuilder {
   interface ThreadContextual {
     @NotNull
     default Delayed after(final long ticks) {
-      return this.after(Internal.durationFrom(ticks));
+      return this.after(Times.durationFrom(ticks));
     }
 
     @NotNull
     default Delayed after(final long duration, @NotNull final TimeUnit unit) {
-      return this.after(Internal.durationFrom(duration, unit));
+      return this.after(Times.durationFrom(duration, unit));
     }
 
     @NotNull
@@ -55,12 +55,12 @@ public interface TaskBuilder {
 
     @NotNull
     default ContextualTaskBuilder afterAndEvery(final long ticks) {
-      return this.afterAndEvery(Internal.durationFrom(ticks));
+      return this.afterAndEvery(Times.durationFrom(ticks));
     }
 
     @NotNull
     default ContextualTaskBuilder afterAndEvery(final long duration, @NotNull final TimeUnit unit) {
-      return this.afterAndEvery(Internal.durationFrom(duration, unit));
+      return this.afterAndEvery(Times.durationFrom(duration, unit));
     }
 
     @NotNull
@@ -68,12 +68,12 @@ public interface TaskBuilder {
 
     @NotNull
     default ContextualTaskBuilder every(final long ticks) {
-      return this.every(Internal.durationFrom(ticks));
+      return this.every(Times.durationFrom(ticks));
     }
 
     @NotNull
     default ContextualTaskBuilder every(final long duration, @NotNull final TimeUnit unit) {
-      return this.every(Internal.durationFrom(duration, unit));
+      return this.every(Times.durationFrom(duration, unit));
     }
 
     @NotNull

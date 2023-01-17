@@ -17,7 +17,7 @@ public interface Scheduler {
 
   @NotNull
   default <T> Promise<T> callLater(@NotNull final Callable<T> callable, final long delayTicks) {
-    return this.callLater(callable, Internal.durationFrom(delayTicks));
+    return this.callLater(callable, Times.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -26,7 +26,7 @@ public interface Scheduler {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.callLater(callable, Internal.durationFrom(delay, unit));
+    return this.callLater(callable, Times.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -45,7 +45,7 @@ public interface Scheduler {
 
   @NotNull
   default Promise<Void> runLater(@NotNull final Runnable runnable, final long delayTicks) {
-    return this.runLater(runnable, Internal.durationFrom(delayTicks));
+    return this.runLater(runnable, Times.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -54,7 +54,7 @@ public interface Scheduler {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.runLater(runnable, Internal.durationFrom(delay, unit));
+    return this.runLater(runnable, Times.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -68,8 +68,8 @@ public interface Scheduler {
   ) {
     return this.runRepeating(
         taskConsumer,
-        Internal.durationFrom(delayTicks),
-        Internal.durationFrom(intervalTicks)
+        Times.durationFrom(delayTicks),
+        Times.durationFrom(intervalTicks)
       );
   }
 
@@ -83,8 +83,8 @@ public interface Scheduler {
   ) {
     return this.runRepeating(
         taskConsumer,
-        Internal.durationFrom(delay, delayUnit),
-        Internal.durationFrom(interval, intervalUnit)
+        Times.durationFrom(delay, delayUnit),
+        Times.durationFrom(interval, intervalUnit)
       );
   }
 
@@ -109,8 +109,8 @@ public interface Scheduler {
   ) {
     return this.runRepeating(
         runnable,
-        Internal.durationFrom(delayTicks),
-        Internal.durationFrom(intervalTicks)
+        Times.durationFrom(delayTicks),
+        Times.durationFrom(intervalTicks)
       );
   }
 
@@ -124,8 +124,8 @@ public interface Scheduler {
   ) {
     return this.runRepeating(
         runnable,
-        Internal.durationFrom(delay, delayUnit),
-        Internal.durationFrom(interval, intervalUnit)
+        Times.durationFrom(delay, delayUnit),
+        Times.durationFrom(interval, intervalUnit)
       );
   }
 
@@ -146,8 +146,8 @@ public interface Scheduler {
   ) {
     return this.runRepeatingCloseIf(
         taskPredicate,
-        Internal.durationFrom(delayTicks),
-        Internal.durationFrom(intervalTicks)
+        Times.durationFrom(delayTicks),
+        Times.durationFrom(intervalTicks)
       );
   }
 
@@ -161,8 +161,8 @@ public interface Scheduler {
   ) {
     return this.runRepeatingCloseIf(
         taskPredicate,
-        Internal.durationFrom(delay, delayUnit),
-        Internal.durationFrom(interval, intervalUnit)
+        Times.durationFrom(delay, delayUnit),
+        Times.durationFrom(interval, intervalUnit)
       );
   }
 
@@ -181,8 +181,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeating(
         task,
-        Internal.durationFrom(delayTicks),
-        Internal.durationFrom(intervalTicks)
+        Times.durationFrom(delayTicks),
+        Times.durationFrom(intervalTicks)
       );
   }
 
@@ -195,8 +195,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeating(
         task,
-        Internal.durationFrom(delay, unit),
-        Internal.durationFrom(interval, unit)
+        Times.durationFrom(delay, unit),
+        Times.durationFrom(interval, unit)
       );
   }
 
@@ -217,8 +217,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeating(
         taskConsumer,
-        Internal.durationFrom(delayTicks),
-        Internal.durationFrom(intervalTicks)
+        Times.durationFrom(delayTicks),
+        Times.durationFrom(intervalTicks)
       );
   }
 
@@ -231,8 +231,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeating(
         taskConsumer,
-        Internal.durationFrom(delay, unit),
-        Internal.durationFrom(delay, unit)
+        Times.durationFrom(delay, unit),
+        Times.durationFrom(delay, unit)
       );
   }
 
@@ -257,8 +257,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeatingCloseIf(
         taskPredicate,
-        Internal.durationFrom(delayTicks),
-        Internal.durationFrom(intervalTicks)
+        Times.durationFrom(delayTicks),
+        Times.durationFrom(intervalTicks)
       );
   }
 
@@ -271,8 +271,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeatingCloseIf(
         taskPredicate,
-        Internal.durationFrom(delay, unit),
-        Internal.durationFrom(delay, unit)
+        Times.durationFrom(delay, unit),
+        Times.durationFrom(delay, unit)
       );
   }
 
@@ -290,7 +290,7 @@ public interface Scheduler {
 
   @NotNull
   default <T> Promise<T> supplyLater(@NotNull final Supplier<T> supplier, final long delayTicks) {
-    return this.supplyLater(supplier, Internal.durationFrom(delayTicks));
+    return this.supplyLater(supplier, Times.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -299,7 +299,7 @@ public interface Scheduler {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.supplyLater(supplier, Internal.durationFrom(delay, unit));
+    return this.supplyLater(supplier, Times.durationFrom(delay, unit));
   }
 
   @NotNull
