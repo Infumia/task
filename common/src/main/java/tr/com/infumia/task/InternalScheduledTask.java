@@ -49,10 +49,7 @@ final class InternalScheduledTask implements InternalTask {
     throw new UnsupportedOperationException();
   }
 
-  void scheduleAtFixedRate(
-    @NotNull final Duration initialDelay,
-    @NotNull final Duration period
-  ) {
+  void scheduleAtFixedRate(@NotNull final Duration initialDelay, @NotNull final Duration period) {
     if (this.task != null) {
       throw new IllegalStateException("You cannot schedule the same task twice!");
     }
