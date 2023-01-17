@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-public final class PromiseImpl<V> implements Promise<V> {
+final class PromiseImpl<V> implements Promise<V> {
 
   AtomicBoolean cancelled = new AtomicBoolean(false);
 
@@ -22,7 +22,7 @@ public final class PromiseImpl<V> implements Promise<V> {
 
   AtomicBoolean supplied = new AtomicBoolean(false);
 
-  public PromiseImpl() {
+  PromiseImpl() {
     this.future = new CompletableFuture<>();
   }
 

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import tr.com.infumia.terminable.Terminable;
 
 @UtilityClass
-public class Internal {
+class Internal {
 
   private final AtomicReference<Logger> LOGGER = new AtomicReference<>();
 
@@ -16,7 +16,7 @@ public class Internal {
   private final AtomicReference<SchedulerProvider> SCHEDULER_PROVIDER = new AtomicReference<>();
 
   @NotNull
-  public Terminable init(
+  Terminable init(
     @NotNull final SchedulerProvider schedulerProvider,
     @NotNull final Logger logger
   ) {
