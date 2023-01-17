@@ -9,7 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import tr.com.infumia.terminable.Terminable;
 
 @UtilityClass
-class Internal {
+public class Internal {
+
+  private final AtomicReference<Logger> LOGGER = new AtomicReference<>();
 
   private final AtomicReference<Thread> MAIN_THREAD = new AtomicReference<>();
 
@@ -21,6 +23,21 @@ class Internal {
 
   private final long MILLISECONDS_PER_TICK =
     Internal.MILLISECONDS_PER_SECOND / Internal.TICKS_PER_SECOND;
+
+  @NotNull
+  public Terminable init(
+    @NotNull final SchedulerProvider schedulerProvider,
+    @NotNull final Logger logger
+  ) {
+    Internal.MAIN_THREAD.set(Thread.currentThread());
+    Internal.SCHEDULER_PROVIDER.set(schedulerProvider);
+    Internal.LOGGER.set(logger);
+    return AsyncExecutor.INSTANCE::cancelRepeatingTasks;
+  }
+
+  public long ticksFrom(@NotNull final Duration duration) {
+    return duration.toMillis() / Internal.MILLISECONDS_PER_TICK;
+  }
 
   @NotNull
   Scheduler async() {
@@ -46,10 +63,8 @@ class Internal {
   }
 
   @NotNull
-  Terminable init(@NotNull final SchedulerProvider schedulerProvider) {
-    Internal.MAIN_THREAD.set(Thread.currentThread());
-    Internal.SCHEDULER_PROVIDER.set(schedulerProvider);
-    return AsyncExecutor.INSTANCE::cancelRepeatingTasks;
+  Logger logger() {
+    return Objects.requireNonNull(Internal.LOGGER.get(), "initiate the task first!");
   }
 
   @NotNull
@@ -60,10 +75,6 @@ class Internal {
   @NotNull
   Scheduler sync() {
     return Internal.schedulerProvider().sync();
-  }
-
-  long ticksFrom(@NotNull final Duration duration) {
-    return duration.toMillis() / Internal.MILLISECONDS_PER_TICK;
   }
 
   @NotNull

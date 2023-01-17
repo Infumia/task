@@ -13,6 +13,7 @@ record PromiseThrowingSupply<V>(@NotNull PromiseImpl<V> promise, @NotNull Callab
     try {
       this.promise.complete(this.supplier.call());
     } catch (final Throwable throwable) {
+      Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);
     }
   }

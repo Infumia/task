@@ -448,12 +448,6 @@ public interface Promise<V> extends Future<V>, Terminable {
   }
 
   @NotNull
-  default Promise<V> printExceptions() {
-    this.future().whenComplete(Futures.throwIfNotNull());
-    return this;
-  }
-
-  @NotNull
   Promise<V> supply(@Nullable V value);
 
   @NotNull

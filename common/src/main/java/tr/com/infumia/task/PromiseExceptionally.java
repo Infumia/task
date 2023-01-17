@@ -17,6 +17,7 @@ record PromiseExceptionally<U>(
     try {
       this.promise.complete(this.function.apply(this.throwable));
     } catch (final Throwable throwable) {
+      Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);
     }
   }

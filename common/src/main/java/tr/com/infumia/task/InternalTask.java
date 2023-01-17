@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 
-interface InternalTask extends Task, Runnable {
+public interface InternalTask extends Task, Runnable {
   @NotNull
   Predicate<Task> backingTask();
 

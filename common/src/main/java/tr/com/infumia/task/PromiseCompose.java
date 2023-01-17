@@ -27,6 +27,7 @@ record PromiseCompose<V, U>(
         }
       }
     } catch (final Throwable throwable) {
+      Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);
     }
   }

@@ -27,7 +27,7 @@ public interface ServerThreadLock extends Terminable {
         this.obtained.countDown();
         return;
       }
-      Internal.sync().run(this::signal);
+      Schedulers.sync().run(this::signal);
       this.await();
     }
 

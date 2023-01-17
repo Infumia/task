@@ -21,9 +21,11 @@ import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-final class AsyncExecutor extends AbstractExecutorService implements ScheduledExecutorService {
+public final class AsyncExecutor
+  extends AbstractExecutorService
+  implements ScheduledExecutorService {
 
-  static final AsyncExecutor INSTANCE = new AsyncExecutor();
+  public static final AsyncExecutor INSTANCE = new AsyncExecutor();
 
   @NotNull
   ExecutorService executorService;

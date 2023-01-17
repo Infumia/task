@@ -16,8 +16,9 @@ record PromiseApply<V, U>(
     }
     try {
       this.promise.complete(this.function.apply(this.value));
-    } catch (final Throwable t) {
-      this.promise.completeExceptionally(t);
+    } catch (final Throwable throwable) {
+      Internal.logger().severe(throwable.getMessage(), throwable);
+      this.promise.completeExceptionally(throwable);
     }
   }
 }

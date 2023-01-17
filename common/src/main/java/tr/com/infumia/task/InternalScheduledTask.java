@@ -14,9 +14,9 @@ import lombok.experimental.NonFinal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-final class InternalScheduledTask implements InternalTask {
+public final class InternalScheduledTask implements InternalTask {
 
   @Getter
   @NotNull
@@ -49,7 +49,10 @@ final class InternalScheduledTask implements InternalTask {
     throw new UnsupportedOperationException();
   }
 
-  void scheduleAtFixedRate(@NotNull final Duration initialDelay, @NotNull final Duration period) {
+  public void scheduleAtFixedRate(
+    @NotNull final Duration initialDelay,
+    @NotNull final Duration period
+  ) {
     if (this.task != null) {
       throw new IllegalStateException("You cannot schedule the same task twice!");
     }
