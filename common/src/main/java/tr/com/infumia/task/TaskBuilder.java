@@ -26,58 +26,58 @@ public interface TaskBuilder {
 
   interface Delayed extends ContextualPromiseBuilder {
     @NotNull
-    ContextualTaskBuilder every(long ticks);
+    default ContextualTaskBuilder every(final long ticks) {
+      return this.every(Internal.durationFrom(ticks));
+    }
 
     @NotNull
     default ContextualTaskBuilder every(final long duration, @NotNull final TimeUnit unit) {
-      return this.every(Internal.ticksFrom(duration, unit));
+      return this.every(Internal.durationFrom(duration, unit));
     }
 
     @NotNull
-    default ContextualTaskBuilder every(@NotNull final Duration duration) {
-      return this.every(duration.toMillis(), TimeUnit.MILLISECONDS);
-    }
+    ContextualTaskBuilder every(@NotNull Duration duration);
   }
 
   interface ThreadContextual {
     @NotNull
-    Delayed after(long ticks);
+    default Delayed after(final long ticks) {
+      return this.after(Internal.durationFrom(ticks));
+    }
 
     @NotNull
     default Delayed after(final long duration, @NotNull final TimeUnit unit) {
-      return this.after(Internal.ticksFrom(duration, unit));
+      return this.after(Internal.durationFrom(duration, unit));
     }
 
     @NotNull
-    default Delayed after(@NotNull final Duration duration) {
-      return this.after(duration.toMillis(), TimeUnit.MILLISECONDS);
-    }
+    Delayed after(@NotNull Duration duration);
 
     @NotNull
-    ContextualTaskBuilder afterAndEvery(long ticks);
+    default ContextualTaskBuilder afterAndEvery(final long ticks) {
+      return this.afterAndEvery(Internal.durationFrom(ticks));
+    }
 
     @NotNull
     default ContextualTaskBuilder afterAndEvery(final long duration, @NotNull final TimeUnit unit) {
-      return this.afterAndEvery(Internal.ticksFrom(duration, unit));
+      return this.afterAndEvery(Internal.durationFrom(duration, unit));
     }
 
     @NotNull
-    default ContextualTaskBuilder afterAndEvery(@NotNull final Duration duration) {
-      return this.afterAndEvery(duration.toMillis(), TimeUnit.MILLISECONDS);
-    }
+    ContextualTaskBuilder afterAndEvery(@NotNull Duration duration);
 
     @NotNull
-    ContextualTaskBuilder every(long ticks);
+    default ContextualTaskBuilder every(final long ticks) {
+      return this.every(Internal.durationFrom(ticks));
+    }
 
     @NotNull
     default ContextualTaskBuilder every(final long duration, @NotNull final TimeUnit unit) {
-      return this.every(Internal.ticksFrom(duration, unit));
+      return this.every(Internal.durationFrom(duration, unit));
     }
 
     @NotNull
-    default ContextualTaskBuilder every(@NotNull final Duration duration) {
-      return this.every(duration.toMillis(), TimeUnit.MILLISECONDS);
-    }
+    ContextualTaskBuilder every(@NotNull Duration duration);
 
     @NotNull
     ContextualPromiseBuilder now();

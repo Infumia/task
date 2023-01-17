@@ -1,6 +1,6 @@
 package tr.com.infumia.task;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -41,7 +41,7 @@ final class BukkitSyncScheduler implements Scheduler {
 
   @NotNull
   @Override
-  public Promise<Void> runLater(@NotNull final Runnable runnable, final long delayTicks) {
+  public Promise<Void> runLater(@NotNull final Runnable runnable, @NotNull final Duration delay) {
     final var promise = new PromiseImpl<Void>();
     final var plugin = BukkitTasks.plugin();
     final var task = new BukkitInternalTask(t -> {
@@ -49,7 +49,7 @@ final class BukkitSyncScheduler implements Scheduler {
       return false;
     });
     if (plugin.isEnabled()) {
-      task.runTaskLater(plugin, delayTicks);
+      task.runTaskLater(plugin, Internal.ticksFrom(delay));
     } else {
       BukkitSyncScheduler.log.error("Plugin attempted to register task while disabled!");
       BukkitSyncScheduler.log.error("The task won't be run because this is a repeating task!");
@@ -61,13 +61,13 @@ final class BukkitSyncScheduler implements Scheduler {
   @Override
   public Task runRepeatingCloseIf(
     @NotNull final Predicate<Task> taskPredicate,
-    final long delayTicks,
-    final long intervalTicks
+    @NotNull final Duration delay,
+    @NotNull final Duration interval
   ) {
     final var plugin = BukkitTasks.plugin();
     final var task = new BukkitInternalTask(taskPredicate);
     if (plugin.isEnabled()) {
-      task.runTaskTimer(plugin, delayTicks, intervalTicks);
+      task.runTaskTimer(plugin, Internal.ticksFrom(delay), Internal.ticksFrom(interval));
     } else {
       BukkitSyncScheduler.log.error("Plugin attempted to register task while disabled!");
       BukkitSyncScheduler.log.error("The task won't be run because this is a repeating task!");
@@ -77,15 +77,14 @@ final class BukkitSyncScheduler implements Scheduler {
 
   @NotNull
   @Override
-  public Task scheduleRepeating(
+  public Task scheduleRepeatingCloseIf(
     @NotNull final Predicate<Task> taskPredicate,
-    final long delay,
-    final long interval,
-    @NotNull final TimeUnit unit
+    @NotNull final Duration delay,
+    @NotNull final Duration interval
   ) {
     BukkitSyncScheduler.log.error(
       "Sync scheduler does not support #scheduleRepeating(Consumer<Task>, long, long, TimeUnit), using async scheduler to schedule repeating instead!"
     );
-    return Schedulers.async().scheduleRepeating(taskPredicate, delay, interval, unit);
+    return Schedulers.async().scheduleRepeatingCloseIf(taskPredicate, delay, interval);
   }
 }

@@ -1,5 +1,6 @@
 package tr.com.infumia.task;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
@@ -29,16 +30,12 @@ final class BukkitAsyncScheduler implements Scheduler {
 
   @NotNull
   @Override
-  public Promise<Void> runLater(
-    @NotNull final Runnable runnable,
-    final long delay,
-    @NotNull final TimeUnit unit
-  ) {
+  public Promise<Void> runLater(@NotNull final Runnable runnable, @NotNull final Duration delay) {
     final var promise = new PromiseImpl<Void>();
     AsyncExecutor.INSTANCE.schedule(
       new PromiseSupply<>(promise, new RunnableToSupplier<>(runnable)),
-      delay,
-      unit
+      delay.toMillis(),
+      TimeUnit.MILLISECONDS
     );
     return promise;
   }
@@ -47,13 +44,17 @@ final class BukkitAsyncScheduler implements Scheduler {
   @Override
   public Task runRepeatingCloseIf(
     @NotNull final Predicate<Task> taskPredicate,
-    final long delayTicks,
-    final long intervalTicks
+    @NotNull final Duration delay,
+    @NotNull final Duration interval
   ) {
     final var plugin = BukkitTasks.plugin();
     final var task = new BukkitInternalTask(taskPredicate);
     if (plugin.isEnabled()) {
-      task.runTaskTimerAsynchronously(plugin, delayTicks, intervalTicks);
+      task.runTaskTimerAsynchronously(
+        plugin,
+        Internal.ticksFrom(delay),
+        Internal.ticksFrom(interval)
+      );
     } else {
       BukkitAsyncScheduler.log.error("Plugin attempted to register task while disabled!");
       BukkitAsyncScheduler.log.error("The task won't be run because this is a repeating task!");
@@ -63,14 +64,13 @@ final class BukkitAsyncScheduler implements Scheduler {
 
   @NotNull
   @Override
-  public Task scheduleRepeating(
+  public Task scheduleRepeatingCloseIf(
     @NotNull final Predicate<Task> taskPredicate,
-    final long delay,
-    final long interval,
-    @NotNull final TimeUnit unit
+    @NotNull final Duration delay,
+    @NotNull final Duration interval
   ) {
     final var task = new InternalScheduledTask(taskPredicate);
-    task.scheduleAtFixedRate(delay, interval, unit);
+    task.scheduleAtFixedRate(delay, interval);
     return task;
   }
 }

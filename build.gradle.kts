@@ -32,7 +32,7 @@ if (spotlessApply) {
       endWithNewline()
       indentWithSpaces(2)
       trimTrailingWhitespace()
-      ktfmt("0.42")
+      ktfmt()
     }
 
     java {
