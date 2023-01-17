@@ -3,7 +3,7 @@ package tr.com.infumia.task;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
-public record PromiseSupply<V>(@NotNull PromiseImpl<V> promise, @NotNull Supplier<V> supplier)
+record PromiseSupply<V>(@NotNull PromiseImpl<V> promise, @NotNull Supplier<V> supplier)
   implements Runnable {
   @Override
   public void run() {

@@ -2,7 +2,7 @@ package tr.com.infumia.task;
 
 import org.jetbrains.annotations.NotNull;
 
-public record UncheckedRunnable(@NotNull Runnable delegate) implements Runnable {
+record UncheckedRunnable(@NotNull Runnable delegate) implements Runnable {
   @Override
   public void run() {
     try {

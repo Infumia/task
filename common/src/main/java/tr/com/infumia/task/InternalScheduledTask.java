@@ -14,9 +14,9 @@ import lombok.experimental.NonFinal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class InternalScheduledTask implements InternalTask {
+final class InternalScheduledTask implements InternalTask {
 
   @Getter
   @NotNull
@@ -49,7 +49,7 @@ public final class InternalScheduledTask implements InternalTask {
     throw new UnsupportedOperationException();
   }
 
-  public void scheduleAtFixedRate(
+  void scheduleAtFixedRate(
     @NotNull final Duration initialDelay,
     @NotNull final Duration period
   ) {

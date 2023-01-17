@@ -2,7 +2,7 @@ package tr.com.infumia.task;
 
 import org.jetbrains.annotations.NotNull;
 
-public interface SchedulerProvider {
+interface SchedulerProvider {
   @NotNull
   static SchedulerProvider of(@NotNull final Scheduler async, @NotNull final Scheduler sync) {
     return new Impl(async, sync);
