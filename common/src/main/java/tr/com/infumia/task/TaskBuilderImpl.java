@@ -1,5 +1,6 @@
 package tr.com.infumia.task;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -37,10 +38,10 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     }
   }
 
-  private record ContextualTaskBuilderTickImpl(
+  private record ContextualTaskBuilderImpl(
     @NotNull ThreadContext context,
-    long delay,
-    long interval
+    @NotNull Duration delay,
+    @NotNull Duration interval
   )
     implements ContextualTaskBuilder {
     @NotNull
@@ -56,7 +57,7 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     }
   }
 
-  private record DelayedBuilder(@NotNull ThreadContext context, long delay)
+  private record DelayedBuilder(@NotNull ThreadContext context, @NotNull Duration delay)
     implements TaskBuilder.Delayed {
     @NotNull
     @Override
@@ -78,8 +79,8 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
 
     @NotNull
     @Override
-    public ContextualTaskBuilder every(final long ticks) {
-      return new ContextualTaskBuilderTickImpl(this.context, this.delay, ticks);
+    public ContextualTaskBuilder every(@NotNull final Duration duration) {
+      return new ContextualTaskBuilderImpl(this.context, this.delay, duration);
     }
   }
 
@@ -94,20 +95,20 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
 
     @NotNull
     @Override
-    public TaskBuilder.Delayed after(final long ticks) {
-      return new DelayedBuilder(this.context, ticks);
+    public TaskBuilder.Delayed after(@NotNull final Duration duration) {
+      return new DelayedBuilder(this.context, duration);
     }
 
     @NotNull
     @Override
-    public ContextualTaskBuilder afterAndEvery(final long ticks) {
-      return new ContextualTaskBuilderTickImpl(this.context, ticks, ticks);
+    public ContextualTaskBuilder afterAndEvery(@NotNull final Duration duration) {
+      return new ContextualTaskBuilderImpl(this.context, duration, duration);
     }
 
     @NotNull
     @Override
-    public ContextualTaskBuilder every(final long ticks) {
-      return new ContextualTaskBuilderTickImpl(this.context, 0, ticks);
+    public ContextualTaskBuilder every(@NotNull final Duration duration) {
+      return new ContextualTaskBuilderImpl(this.context, Duration.ZERO, duration);
     }
 
     @NotNull

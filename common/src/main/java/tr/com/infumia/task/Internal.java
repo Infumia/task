@@ -28,6 +28,16 @@ class Internal {
   }
 
   @NotNull
+  Duration durationFrom(final long ticks) {
+    return Internal.durationFrom(ticks * Internal.MILLISECONDS_PER_TICK, TimeUnit.MILLISECONDS);
+  }
+
+  @NotNull
+  Duration durationFrom(final long duration, @NotNull final TimeUnit unit) {
+    return Duration.of(duration, unit.toChronoUnit());
+  }
+
+  @NotNull
   Scheduler get(@NotNull final ThreadContext context) {
     return switch (context) {
       case SYNC -> Internal.schedulerProvider().sync();
@@ -52,16 +62,8 @@ class Internal {
     return Internal.schedulerProvider().sync();
   }
 
-  long ticksFrom(final long duration, @NotNull final TimeUnit unit) {
-    return Internal.ticksFrom(Duration.of(duration, unit.toChronoUnit()));
-  }
-
   long ticksFrom(@NotNull final Duration duration) {
     return duration.toMillis() / Internal.MILLISECONDS_PER_TICK;
-  }
-
-  static long ticksToMs(final long delayTicks) {
-    return delayTicks * Internal.MILLISECONDS_PER_TICK;
   }
 
   @NotNull

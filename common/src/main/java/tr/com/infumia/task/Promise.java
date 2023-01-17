@@ -57,7 +57,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Supplier<U> supplier,
     final long delayTicks
   ) {
-    return Promise.<U>empty().supplyDelayed(context, supplier, delayTicks);
+    return Promise.supplyingDelayed(context, supplier, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -67,7 +67,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return Promise.<U>empty().supplyDelayed(context, supplier, delay, unit);
+    return Promise.supplyingDelayed(context, supplier, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -84,7 +84,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Supplier<U> supplier,
     final long delayTicks
   ) {
-    return Promise.<U>empty().supplyDelayedAsync(supplier, delayTicks);
+    return Promise.supplyingDelayedAsync(supplier, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -93,7 +93,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return Promise.<U>empty().supplyDelayedAsync(supplier, delay, unit);
+    return Promise.supplyingDelayedAsync(supplier, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -109,7 +109,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Supplier<U> supplier,
     final long delayTicks
   ) {
-    return Promise.<U>empty().supplyDelayedSync(supplier, delayTicks);
+    return Promise.supplyingDelayedSync(supplier, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -118,7 +118,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return Promise.<U>empty().supplyDelayedSync(supplier, delay, unit);
+    return Promise.supplyingDelayedSync(supplier, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -148,7 +148,11 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Callable<U> callable,
     final long delayTicks
   ) {
-    return Promise.<U>empty().supplyExceptionallyDelayed(context, callable, delayTicks);
+    return Promise.supplyingExceptionallyDelayed(
+      context,
+      callable,
+      Internal.durationFrom(delayTicks)
+    );
   }
 
   @NotNull
@@ -158,7 +162,11 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return Promise.<U>empty().supplyExceptionallyDelayed(context, callable, delay, unit);
+    return Promise.supplyingExceptionallyDelayed(
+      context,
+      callable,
+      Internal.durationFrom(delay, unit)
+    );
   }
 
   @NotNull
@@ -175,7 +183,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Callable<U> callable,
     final long delayTicks
   ) {
-    return Promise.<U>empty().supplyExceptionallyDelayedAsync(callable, delayTicks);
+    return Promise.supplyingExceptionallyDelayedAsync(callable, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -184,7 +192,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return Promise.<U>empty().supplyExceptionallyDelayedAsync(callable, delay, unit);
+    return Promise.supplyingExceptionallyDelayedAsync(callable, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -200,7 +208,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Callable<U> callable,
     final long delayTicks
   ) {
-    return Promise.<U>empty().supplyExceptionallyDelayedSync(callable, delayTicks);
+    return Promise.supplyingExceptionallyDelayedSync(callable, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -209,7 +217,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return Promise.<U>empty().supplyExceptionallyDelayedSync(callable, delay, unit);
+    return Promise.supplyingExceptionallyDelayedSync(callable, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -297,46 +305,37 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<Throwable, ? extends V> function,
     final long delayTicks
   ) {
+    return this.exceptionallyDelayed(context, function, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default Promise<V> exceptionallyDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Function<Throwable, ? extends V> function,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
+    return this.exceptionallyDelayed(context, function, Internal.durationFrom(delay, unit));
+  }
+
+  @NotNull
+  default Promise<V> exceptionallyDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Function<Throwable, ? extends V> function,
+    @NotNull final Duration delay
+  ) {
     return switch (context) {
-      case SYNC -> this.exceptionallyDelayedSync(function, delayTicks);
-      case ASYNC -> this.exceptionallyDelayedAsync(function, delayTicks);
+      case SYNC -> this.exceptionallyDelayedSync(function, delay);
+      case ASYNC -> this.exceptionallyDelayedAsync(function, delay);
     };
   }
 
   @NotNull
-  default Promise<V> exceptionallyDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Function<Throwable, ? extends V> function,
-    final long delay,
-    @NotNull final TimeUnit unit
-  ) {
-    return this.exceptionallyDelayed(context, function, Internal.ticksFrom(delay, unit));
-  }
-
-  @NotNull
-  default Promise<V> exceptionallyDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Function<Throwable, ? extends V> function,
-    @NotNull final Duration delay
-  ) {
-    return this.exceptionallyDelayed(context, function, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
   default Promise<V> exceptionallyDelayedAsync(
     @NotNull final Function<Throwable, ? extends V> function,
     final long delayTicks
   ) {
-    final var promise = new PromiseImpl<V>();
-    this.future()
-      .whenComplete((value, t) -> {
-        if (t == null) {
-          promise.complete(value);
-        } else {
-          Executors.asyncDelayed(new PromiseExceptionally<>(promise, function, t), delayTicks);
-        }
-      });
-    return promise;
+    return this.exceptionallyDelayedAsync(function, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -345,7 +344,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.exceptionallyDelayedAsync(function, Internal.ticksFrom(delay, unit));
+    return this.exceptionallyDelayedAsync(function, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -353,21 +352,13 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<Throwable, ? extends V> function,
     @NotNull final Duration delay
   ) {
-    return this.exceptionallyDelayedAsync(function, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
-  default Promise<V> exceptionallyDelayedSync(
-    @NotNull final Function<Throwable, ? extends V> function,
-    final long delayTicks
-  ) {
     final var promise = new PromiseImpl<V>();
     this.future()
       .whenComplete((value, t) -> {
         if (t == null) {
           promise.complete(value);
         } else {
-          Executors.syncDelayed(new PromiseExceptionally<>(promise, function, t), delayTicks);
+          Executors.asyncDelayed(new PromiseExceptionally<>(promise, function, t), delay);
         }
       });
     return promise;
@@ -376,10 +367,18 @@ public interface Promise<V> extends Future<V>, Terminable {
   @NotNull
   default Promise<V> exceptionallyDelayedSync(
     @NotNull final Function<Throwable, ? extends V> function,
+    final long delayTicks
+  ) {
+    return this.exceptionallyDelayedSync(function, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default Promise<V> exceptionallyDelayedSync(
+    @NotNull final Function<Throwable, ? extends V> function,
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.exceptionallyDelayedSync(function, Internal.ticksFrom(delay, unit));
+    return this.exceptionallyDelayedSync(function, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -387,7 +386,16 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<Throwable, ? extends V> function,
     @NotNull final Duration delay
   ) {
-    return this.exceptionallyDelayedSync(function, Internal.ticksFrom(delay));
+    final var promise = new PromiseImpl<V>();
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t == null) {
+          promise.complete(value);
+        } else {
+          Executors.syncDelayed(new PromiseExceptionally<>(promise, function, t), delay);
+        }
+      });
+    return promise;
   }
 
   @NotNull
@@ -468,33 +476,38 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Supplier<V> supplier,
     final long delayTicks
   ) {
+    return this.supplyDelayed(context, supplier, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default Promise<V> supplyDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Supplier<V> supplier,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
+    return this.supplyDelayed(context, supplier, Internal.durationFrom(delay, unit));
+  }
+
+  @NotNull
+  default Promise<V> supplyDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Supplier<V> supplier,
+    @NotNull final Duration delay
+  ) {
     return switch (context) {
-      case SYNC -> this.supplyDelayedSync(supplier, delayTicks);
-      case ASYNC -> this.supplyDelayedAsync(supplier, delayTicks);
+      case SYNC -> this.supplyDelayedSync(supplier, delay);
+      case ASYNC -> this.supplyDelayedAsync(supplier, delay);
     };
   }
 
   @NotNull
-  default Promise<V> supplyDelayed(
-    @NotNull final ThreadContext context,
+  default Promise<V> supplyDelayedAsync(
     @NotNull final Supplier<V> supplier,
-    final long delay,
-    @NotNull final TimeUnit unit
+    final long delayTicks
   ) {
-    return this.supplyDelayed(context, supplier, Internal.ticksFrom(delay, unit));
+    return this.supplyDelayedAsync(supplier, Internal.durationFrom(delayTicks));
   }
-
-  @NotNull
-  default Promise<V> supplyDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Supplier<V> supplier,
-    @NotNull final Duration delay
-  ) {
-    return this.supplyDelayed(context, supplier, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
-  Promise<V> supplyDelayedAsync(@NotNull Supplier<V> supplier, long delayTicks);
 
   @NotNull
   default Promise<V> supplyDelayedAsync(
@@ -502,19 +515,16 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.supplyDelayedAsync(supplier, Internal.ticksFrom(delay, unit));
+    return this.supplyDelayedAsync(supplier, Duration.of(delay, unit.toChronoUnit()));
   }
 
   @NotNull
-  default Promise<V> supplyDelayedAsync(
-    @NotNull final Supplier<V> supplier,
-    @NotNull final Duration delay
-  ) {
-    return this.supplyDelayedAsync(supplier, Internal.ticksFrom(delay));
-  }
+  Promise<V> supplyDelayedAsync(@NotNull Supplier<V> supplier, @NotNull Duration delay);
 
   @NotNull
-  Promise<V> supplyDelayedSync(@NotNull Supplier<V> supplier, long delayTicks);
+  default Promise<V> supplyDelayedSync(@NotNull final Supplier<V> supplier, final long delayTicks) {
+    return this.supplyDelayedSync(supplier, Internal.durationFrom(delayTicks));
+  }
 
   @NotNull
   default Promise<V> supplyDelayedSync(
@@ -522,16 +532,11 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.supplyDelayedSync(supplier, Internal.ticksFrom(delay, unit));
+    return this.supplyDelayedSync(supplier, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
-  default Promise<V> supplyDelayedSync(
-    @NotNull final Supplier<V> supplier,
-    @NotNull final Duration delay
-  ) {
-    return this.supplyDelayedSync(supplier, Internal.ticksFrom(delay));
-  }
+  Promise<V> supplyDelayedSync(@NotNull Supplier<V> supplier, @NotNull Duration delay);
 
   @NotNull
   Promise<V> supplyException(@NotNull Throwable exception);
@@ -556,33 +561,38 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Callable<V> callable,
     final long delayTicks
   ) {
+    return this.supplyExceptionallyDelayed(context, callable, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default Promise<V> supplyExceptionallyDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Callable<V> callable,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
+    return this.supplyExceptionallyDelayed(context, callable, Internal.durationFrom(delay, unit));
+  }
+
+  @NotNull
+  default Promise<V> supplyExceptionallyDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Callable<V> callable,
+    @NotNull final Duration delay
+  ) {
     return switch (context) {
-      case SYNC -> this.supplyExceptionallyDelayedSync(callable, delayTicks);
-      case ASYNC -> this.supplyExceptionallyDelayedAsync(callable, delayTicks);
+      case SYNC -> this.supplyExceptionallyDelayedSync(callable, delay);
+      case ASYNC -> this.supplyExceptionallyDelayedAsync(callable, delay);
     };
   }
 
   @NotNull
-  default Promise<V> supplyExceptionallyDelayed(
-    @NotNull final ThreadContext context,
+  default Promise<V> supplyExceptionallyDelayedAsync(
     @NotNull final Callable<V> callable,
-    final long delay,
-    @NotNull final TimeUnit unit
+    final long delayTicks
   ) {
-    return this.supplyExceptionallyDelayed(context, callable, Internal.ticksFrom(delay, unit));
+    return this.supplyExceptionallyDelayedAsync(callable, Internal.durationFrom(delayTicks));
   }
-
-  @NotNull
-  default Promise<V> supplyExceptionallyDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Callable<V> callable,
-    @NotNull final Duration delay
-  ) {
-    return this.supplyExceptionallyDelayed(context, callable, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
-  Promise<V> supplyExceptionallyDelayedAsync(@NotNull Callable<V> callable, long delayTicks);
 
   @NotNull
   default Promise<V> supplyExceptionallyDelayedAsync(
@@ -590,19 +600,22 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.supplyExceptionallyDelayedAsync(callable, Internal.ticksFrom(delay, unit));
+    return this.supplyExceptionallyDelayedAsync(callable, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
-  default Promise<V> supplyExceptionallyDelayedAsync(
+  Promise<V> supplyExceptionallyDelayedAsync(
     @NotNull final Callable<V> callable,
     @NotNull final Duration delay
-  ) {
-    return this.supplyExceptionallyDelayedAsync(callable, Internal.ticksFrom(delay));
-  }
+  );
 
   @NotNull
-  Promise<V> supplyExceptionallyDelayedSync(@NotNull Callable<V> callable, long delayTicks);
+  default Promise<V> supplyExceptionallyDelayedSync(
+    @NotNull final Callable<V> callable,
+    final long delayTicks
+  ) {
+    return this.supplyExceptionallyDelayedSync(callable, Internal.durationFrom(delayTicks));
+  }
 
   @NotNull
   default Promise<V> supplyExceptionallyDelayedSync(
@@ -610,16 +623,14 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.supplyExceptionallyDelayedSync(callable, Internal.ticksFrom(delay, unit));
+    return this.supplyExceptionallyDelayedSync(callable, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
-  default Promise<V> supplyExceptionallyDelayedSync(
+  Promise<V> supplyExceptionallyDelayedSync(
     @NotNull final Callable<V> callable,
     @NotNull final Duration delay
-  ) {
-    return this.supplyExceptionallyDelayedSync(callable, Internal.ticksFrom(delay));
-  }
+  );
 
   @NotNull
   Promise<V> supplyExceptionallySync(@NotNull Callable<V> callable);
@@ -652,37 +663,37 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Consumer<? super V> action,
     final long delayTicks
   ) {
+    return this.thenAcceptDelayed(context, action, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default Promise<Void> thenAcceptDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Consumer<? super V> action,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
+    return this.thenAcceptDelayed(context, action, Internal.durationFrom(delay, unit));
+  }
+
+  @NotNull
+  default Promise<Void> thenAcceptDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Consumer<? super V> action,
+    @NotNull final Duration delay
+  ) {
     return switch (context) {
-      case SYNC -> this.thenAcceptDelayedSync(action, delayTicks);
-      case ASYNC -> this.thenAcceptDelayedAsync(action, delayTicks);
+      case SYNC -> this.thenAcceptDelayedSync(action, delay);
+      case ASYNC -> this.thenAcceptDelayedAsync(action, delay);
     };
   }
 
   @NotNull
-  default Promise<Void> thenAcceptDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Consumer<? super V> action,
-    final long delay,
-    @NotNull final TimeUnit unit
-  ) {
-    return this.thenAcceptDelayed(context, action, Internal.ticksFrom(delay, unit));
-  }
-
-  @NotNull
-  default Promise<Void> thenAcceptDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Consumer<? super V> action,
-    @NotNull final Duration delay
-  ) {
-    return this.thenAcceptDelayed(context, action, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
   default Promise<Void> thenAcceptDelayedAsync(
     @NotNull final Consumer<? super V> action,
     final long delayTicks
   ) {
-    return this.thenApplyDelayedAsync(new ConsumerToFunction<>(action), delayTicks);
+    return this.thenAcceptDelayedAsync(action, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -691,7 +702,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.thenAcceptDelayedAsync(action, Internal.ticksFrom(delay, unit));
+    return this.thenAcceptDelayedAsync(action, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -699,7 +710,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Consumer<? super V> action,
     @NotNull final Duration delay
   ) {
-    return this.thenAcceptDelayedAsync(action, Internal.ticksFrom(delay));
+    return this.thenApplyDelayedAsync(new ConsumerToFunction<>(action), delay);
   }
 
   @NotNull
@@ -707,7 +718,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Consumer<? super V> action,
     final long delayTicks
   ) {
-    return this.thenApplyDelayedSync(new ConsumerToFunction<>(action), delayTicks);
+    return this.thenAcceptDelayedSync(action, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -716,7 +727,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.thenAcceptDelayedSync(action, Internal.ticksFrom(delay, unit));
+    return this.thenAcceptDelayedSync(action, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -724,7 +735,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Consumer<? super V> action,
     @NotNull final Duration delay
   ) {
-    return this.thenAcceptDelayedSync(action, Internal.ticksFrom(delay));
+    return this.thenApplyDelayedSync(new ConsumerToFunction<>(action), delay);
   }
 
   @NotNull
@@ -763,46 +774,37 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<? super V, ? extends U> function,
     final long delayTicks
   ) {
+    return this.thenApplyDelayed(context, function, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default <U> Promise<U> thenApplyDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Function<? super V, ? extends U> function,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
+    return this.thenApplyDelayed(context, function, Internal.durationFrom(delay, unit));
+  }
+
+  @NotNull
+  default <U> Promise<U> thenApplyDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Function<? super V, ? extends U> function,
+    @NotNull final Duration delay
+  ) {
     return switch (context) {
-      case SYNC -> this.thenApplyDelayedSync(function, delayTicks);
-      case ASYNC -> this.thenApplyDelayedAsync(function, delayTicks);
+      case SYNC -> this.thenApplyDelayedSync(function, delay);
+      case ASYNC -> this.thenApplyDelayedAsync(function, delay);
     };
   }
 
   @NotNull
-  default <U> Promise<U> thenApplyDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Function<? super V, ? extends U> function,
-    final long delay,
-    @NotNull final TimeUnit unit
-  ) {
-    return this.thenApplyDelayed(context, function, Internal.ticksFrom(delay, unit));
-  }
-
-  @NotNull
-  default <U> Promise<U> thenApplyDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Function<? super V, ? extends U> function,
-    @NotNull final Duration delay
-  ) {
-    return this.thenApplyDelayed(context, function, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
   default <U> Promise<U> thenApplyDelayedAsync(
     @NotNull final Function<? super V, ? extends U> function,
     final long delayTicks
   ) {
-    final var promise = new PromiseImpl<U>();
-    this.future()
-      .whenComplete((value, t) -> {
-        if (t != null) {
-          promise.completeExceptionally(t);
-        } else {
-          Executors.asyncDelayed(new PromiseApply<>(promise, function, value), delayTicks);
-        }
-      });
-    return promise;
+    return this.thenApplyDelayedAsync(function, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -811,7 +813,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.thenApplyDelayedAsync(function, Internal.ticksFrom(delay, unit));
+    return this.thenApplyDelayedAsync(function, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -819,21 +821,13 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<? super V, ? extends U> function,
     @NotNull final Duration delay
   ) {
-    return this.thenApplyDelayedAsync(function, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
-  default <U> Promise<U> thenApplyDelayedSync(
-    @NotNull final Function<? super V, ? extends U> function,
-    final long delayTicks
-  ) {
     final var promise = new PromiseImpl<U>();
     this.future()
       .whenComplete((value, t) -> {
         if (t != null) {
           promise.completeExceptionally(t);
         } else {
-          Executors.syncDelayed(new PromiseApply<>(promise, function, value), delayTicks);
+          Executors.asyncDelayed(new PromiseApply<>(promise, function, value), delay);
         }
       });
     return promise;
@@ -842,10 +836,18 @@ public interface Promise<V> extends Future<V>, Terminable {
   @NotNull
   default <U> Promise<U> thenApplyDelayedSync(
     @NotNull final Function<? super V, ? extends U> function,
+    final long delayTicks
+  ) {
+    return this.thenApplyDelayedSync(function, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default <U> Promise<U> thenApplyDelayedSync(
+    @NotNull final Function<? super V, ? extends U> function,
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.thenApplyDelayedSync(function, Internal.ticksFrom(delay, unit));
+    return this.thenApplyDelayedSync(function, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -853,7 +855,16 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<? super V, ? extends U> function,
     @NotNull final Duration delay
   ) {
-    return this.thenApplyDelayedSync(function, Internal.ticksFrom(delay));
+    final var promise = new PromiseImpl<U>();
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          Executors.syncDelayed(new PromiseApply<>(promise, function, value), delay);
+        }
+      });
+    return promise;
   }
 
   @NotNull
@@ -902,16 +913,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<? super V, ? extends Promise<U>> function,
     final long delayTicks
   ) {
-    final var promise = new PromiseImpl<U>();
-    this.future()
-      .whenComplete((value, t) -> {
-        if (t != null) {
-          promise.completeExceptionally(t);
-        } else {
-          Executors.asyncDelayed(new PromiseCompose<>(promise, function, value, false), delayTicks);
-        }
-      });
-    return promise;
+    return this.thenComposeDelayedAsync(function, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -920,7 +922,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.thenComposeDelayedAsync(function, Internal.ticksFrom(delay, unit));
+    return this.thenComposeDelayedAsync(function, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -928,7 +930,16 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<? super V, ? extends Promise<U>> function,
     @NotNull final Duration delay
   ) {
-    return this.thenComposeDelayedAsync(function, Internal.ticksFrom(delay));
+    final var promise = new PromiseImpl<U>();
+    this.future()
+      .whenComplete((value, t) -> {
+        if (t != null) {
+          promise.completeExceptionally(t);
+        } else {
+          Executors.asyncDelayed(new PromiseCompose<>(promise, function, value, false), delay);
+        }
+      });
+    return promise;
   }
 
   @NotNull
@@ -937,35 +948,52 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Function<? super V, ? extends Promise<U>> function,
     final long delayTicks
   ) {
+    return this.thenComposeDelayedSync(context, function, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default <U> Promise<U> thenComposeDelayedSync(
+    @NotNull final ThreadContext context,
+    @NotNull final Function<? super V, ? extends Promise<U>> function,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
+    return this.thenComposeDelayedSync(context, function, Internal.durationFrom(delay, unit));
+  }
+
+  @NotNull
+  default <U> Promise<U> thenComposeDelayedSync(
+    @NotNull final ThreadContext context,
+    @NotNull final Function<? super V, ? extends Promise<U>> function,
+    @NotNull final Duration delay
+  ) {
     return switch (context) {
-      case SYNC -> this.thenComposeDelayedSync(function, delayTicks);
-      case ASYNC -> this.thenComposeDelayedAsync(function, delayTicks);
+      case SYNC -> this.thenComposeDelayedSync(function, delay);
+      case ASYNC -> this.thenComposeDelayedAsync(function, delay);
     };
   }
 
   @NotNull
   default <U> Promise<U> thenComposeDelayedSync(
-    @NotNull final ThreadContext context,
+    @NotNull final Function<? super V, ? extends Promise<U>> function,
+    final long delayTicks
+  ) {
+    return this.thenComposeDelayedSync(function, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default <U> Promise<U> thenComposeDelayedSync(
     @NotNull final Function<? super V, ? extends Promise<U>> function,
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.thenComposeDelayedSync(context, function, Internal.ticksFrom(delay, unit));
+    return this.thenComposeDelayedSync(function, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
   default <U> Promise<U> thenComposeDelayedSync(
-    @NotNull final ThreadContext context,
     @NotNull final Function<? super V, ? extends Promise<U>> function,
     @NotNull final Duration delay
-  ) {
-    return this.thenComposeDelayedSync(context, function, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
-  default <U> Promise<U> thenComposeDelayedSync(
-    @NotNull final Function<? super V, ? extends Promise<U>> function,
-    final long delayTicks
   ) {
     final var promise = new PromiseImpl<U>();
     this.future()
@@ -973,27 +1001,10 @@ public interface Promise<V> extends Future<V>, Terminable {
         if (t != null) {
           promise.completeExceptionally(t);
         } else {
-          Executors.syncDelayed(new PromiseCompose<>(promise, function, value, true), delayTicks);
+          Executors.syncDelayed(new PromiseCompose<>(promise, function, value, true), delay);
         }
       });
     return promise;
-  }
-
-  @NotNull
-  default <U> Promise<U> thenComposeDelayedSync(
-    @NotNull final Function<? super V, ? extends Promise<U>> function,
-    final long delay,
-    @NotNull final TimeUnit unit
-  ) {
-    return this.thenComposeDelayedSync(function, Internal.ticksFrom(delay, unit));
-  }
-
-  @NotNull
-  default <U> Promise<U> thenComposeDelayedSync(
-    @NotNull final Function<? super V, ? extends Promise<U>> function,
-    @NotNull final Duration delay
-  ) {
-    return this.thenComposeDelayedSync(function, Internal.ticksFrom(delay));
   }
 
   @NotNull
@@ -1034,34 +1045,34 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Runnable action,
     final long delayTicks
   ) {
+    return this.thenRunDelayed(context, action, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default Promise<Void> thenRunDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Runnable action,
+    final long delay,
+    @NotNull final TimeUnit unit
+  ) {
+    return this.thenRunDelayed(context, action, Internal.durationFrom(delay, unit));
+  }
+
+  @NotNull
+  default Promise<Void> thenRunDelayed(
+    @NotNull final ThreadContext context,
+    @NotNull final Runnable action,
+    @NotNull final Duration delay
+  ) {
     return switch (context) {
-      case SYNC -> this.thenRunDelayedSync(action, delayTicks);
-      case ASYNC -> this.thenRunDelayedAsync(action, delayTicks);
+      case SYNC -> this.thenRunDelayedSync(action, delay);
+      case ASYNC -> this.thenRunDelayedAsync(action, delay);
     };
   }
 
   @NotNull
-  default Promise<Void> thenRunDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Runnable action,
-    final long delay,
-    @NotNull final TimeUnit unit
-  ) {
-    return this.thenRunDelayed(context, action, Internal.ticksFrom(delay, unit));
-  }
-
-  @NotNull
-  default Promise<Void> thenRunDelayed(
-    @NotNull final ThreadContext context,
-    @NotNull final Runnable action,
-    @NotNull final Duration delay
-  ) {
-    return this.thenRunDelayed(context, action, Internal.ticksFrom(delay));
-  }
-
-  @NotNull
   default Promise<Void> thenRunDelayedAsync(@NotNull final Runnable action, final long delayTicks) {
-    return this.thenApplyDelayedAsync(new RunnableToFunction<>(action), delayTicks);
+    return this.thenRunDelayedAsync(action, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -1070,7 +1081,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.thenRunDelayedAsync(action, Internal.ticksFrom(delay, unit));
+    return this.thenRunDelayedAsync(action, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -1078,12 +1089,12 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Runnable action,
     @NotNull final Duration delay
   ) {
-    return this.thenRunDelayedAsync(action, Internal.ticksFrom(delay));
+    return this.thenApplyDelayedAsync(new RunnableToFunction<>(action), delay);
   }
 
   @NotNull
   default Promise<Void> thenRunDelayedSync(@NotNull final Runnable action, final long delayTicks) {
-    return this.thenApplyDelayedSync(new RunnableToFunction<>(action), delayTicks);
+    return this.thenRunDelayedSync(action, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -1092,7 +1103,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.thenRunDelayedSync(action, Internal.ticksFrom(delay, unit));
+    return this.thenRunDelayedSync(action, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -1100,7 +1111,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final Runnable action,
     @NotNull final Duration delay
   ) {
-    return this.thenRunDelayedSync(action, Internal.ticksFrom(delay));
+    return this.thenApplyDelayedSync(new RunnableToFunction<>(action), delay);
   }
 
   @NotNull

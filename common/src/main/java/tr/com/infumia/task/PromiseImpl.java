@@ -1,5 +1,6 @@
 package tr.com.infumia.task;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -68,10 +69,10 @@ final class PromiseImpl<V> implements Promise<V> {
   @Override
   public PromiseImpl<V> supplyDelayedAsync(
     @NotNull final Supplier<V> supplier,
-    final long delayTicks
+    @NotNull final Duration delay
   ) {
     this.markAsSupplied();
-    Executors.asyncDelayed(new PromiseSupply<>(this, supplier), delayTicks);
+    Executors.asyncDelayed(new PromiseSupply<>(this, supplier), delay);
     return this;
   }
 
@@ -79,10 +80,10 @@ final class PromiseImpl<V> implements Promise<V> {
   @Override
   public PromiseImpl<V> supplyDelayedSync(
     @NotNull final Supplier<V> supplier,
-    final long delayTicks
+    @NotNull final Duration delay
   ) {
     this.markAsSupplied();
-    Executors.syncDelayed(new PromiseSupply<>(this, supplier), delayTicks);
+    Executors.syncDelayed(new PromiseSupply<>(this, supplier), delay);
     return this;
   }
 
@@ -106,10 +107,10 @@ final class PromiseImpl<V> implements Promise<V> {
   @Override
   public PromiseImpl<V> supplyExceptionallyDelayedAsync(
     @NotNull final Callable<V> callable,
-    final long delayTicks
+    @NotNull final Duration delay
   ) {
     this.markAsSupplied();
-    Executors.asyncDelayed(new PromiseThrowingSupply<>(this, callable), delayTicks);
+    Executors.asyncDelayed(new PromiseThrowingSupply<>(this, callable), delay);
     return this;
   }
 
@@ -117,10 +118,10 @@ final class PromiseImpl<V> implements Promise<V> {
   @Override
   public PromiseImpl<V> supplyExceptionallyDelayedSync(
     @NotNull final Callable<V> callable,
-    final long delayTicks
+    @NotNull final Duration delay
   ) {
     this.markAsSupplied();
-    Executors.syncDelayed(new PromiseThrowingSupply<>(this, callable), delayTicks);
+    Executors.syncDelayed(new PromiseThrowingSupply<>(this, callable), delay);
     return this;
   }
 

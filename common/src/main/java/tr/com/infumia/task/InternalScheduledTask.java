@@ -1,5 +1,6 @@
 package tr.com.infumia.task;
 
+import java.time.Duration;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,14 +49,16 @@ final class InternalScheduledTask implements InternalTask {
     throw new UnsupportedOperationException();
   }
 
-  void scheduleAtFixedRate(
-    final long initialDelay,
-    final long period,
-    @NotNull final TimeUnit unit
-  ) {
+  void scheduleAtFixedRate(@NotNull final Duration initialDelay, @NotNull final Duration period) {
     if (this.task != null) {
       throw new IllegalStateException("You cannot schedule the same task twice!");
     }
-    this.task = AsyncExecutor.INSTANCE.scheduleAtFixedRate(this, initialDelay, period, unit);
+    this.task =
+      AsyncExecutor.INSTANCE.scheduleAtFixedRate(
+        this,
+        initialDelay.toMillis(),
+        period.toMillis(),
+        TimeUnit.MILLISECONDS
+      );
   }
 }

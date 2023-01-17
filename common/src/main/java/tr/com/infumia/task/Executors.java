@@ -1,5 +1,6 @@
 package tr.com.infumia.task;
 
+import java.time.Duration;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,11 +15,11 @@ class Executors {
     }
   }
 
-  void asyncDelayed(@NotNull final Runnable runnable, final long delayInTicks) {
-    if (delayInTicks <= 0L) {
+  void asyncDelayed(@NotNull final Runnable runnable, @NotNull final Duration delay) {
+    if (delay.isNegative() || delay.isZero()) {
       Executors.async(runnable);
     } else {
-      Internal.async().runLater(new UncheckedRunnable(runnable), delayInTicks);
+      Internal.async().runLater(new UncheckedRunnable(runnable), delay);
     }
   }
 
@@ -30,11 +31,11 @@ class Executors {
     }
   }
 
-  void syncDelayed(@NotNull final Runnable runnable, final long delayInTicks) {
-    if (delayInTicks <= 0L) {
+  void syncDelayed(@NotNull final Runnable runnable, @NotNull final Duration delay) {
+    if (delay.isNegative() || delay.isZero()) {
       Executors.sync(runnable);
     } else {
-      Internal.sync().runLater(new UncheckedRunnable(runnable), delayInTicks);
+      Internal.sync().runLater(new UncheckedRunnable(runnable), delay);
     }
   }
 }
