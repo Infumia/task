@@ -50,11 +50,7 @@ final class BukkitAsyncScheduler implements Scheduler {
     final var plugin = BukkitTasks.plugin();
     final var task = new BukkitInternalTask(taskPredicate);
     if (plugin.isEnabled()) {
-      task.runTaskTimerAsynchronously(
-        plugin,
-        Internal.ticksFrom(delay),
-        Internal.ticksFrom(interval)
-      );
+      task.runTaskTimerAsynchronously(plugin, Times.ticksFrom(delay), Times.ticksFrom(interval));
     } else {
       BukkitAsyncScheduler.log.error("Plugin attempted to register task while disabled!");
       BukkitAsyncScheduler.log.error("The task won't be run because this is a repeating task!");

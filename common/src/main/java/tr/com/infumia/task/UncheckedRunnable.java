@@ -7,8 +7,8 @@ record UncheckedRunnable(@NotNull Runnable delegate) implements Runnable {
   public void run() {
     try {
       this.delegate.run();
-    } catch (final Throwable t) {
-      t.printStackTrace();
+    } catch (final Throwable throwable) {
+      Internal.logger().severe(throwable.getMessage(), throwable);
     }
   }
 }

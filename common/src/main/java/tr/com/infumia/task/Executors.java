@@ -11,7 +11,7 @@ class Executors {
     if (ThreadContext.forCurrentThread() == ThreadContext.ASYNC) {
       new UncheckedRunnable(runnable).run();
     } else {
-      Internal.async().run(runnable);
+      Schedulers.async().run(runnable);
     }
   }
 
@@ -19,7 +19,7 @@ class Executors {
     if (delay.isNegative() || delay.isZero()) {
       Executors.async(runnable);
     } else {
-      Internal.async().runLater(new UncheckedRunnable(runnable), delay);
+      Schedulers.async().runLater(new UncheckedRunnable(runnable), delay);
     }
   }
 
@@ -27,7 +27,7 @@ class Executors {
     if (ThreadContext.forCurrentThread() == ThreadContext.SYNC) {
       new UncheckedRunnable(runnable).run();
     } else {
-      Internal.sync().run(runnable);
+      Schedulers.sync().run(runnable);
     }
   }
 
@@ -35,7 +35,7 @@ class Executors {
     if (delay.isNegative() || delay.isZero()) {
       Executors.sync(runnable);
     } else {
-      Internal.sync().runLater(new UncheckedRunnable(runnable), delay);
+      Schedulers.sync().runLater(new UncheckedRunnable(runnable), delay);
     }
   }
 }

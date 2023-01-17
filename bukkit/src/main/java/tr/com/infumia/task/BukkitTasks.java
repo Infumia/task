@@ -26,7 +26,8 @@ public class BukkitTasks {
     );
     BukkitTasks.PLUGIN.set(plugin);
     return Internal.init(
-      SchedulerProvider.of(BukkitTasks.ASYNC_SCHEDULER, BukkitTasks.SYNC_SCHEDULER)
+      SchedulerProvider.of(BukkitTasks.ASYNC_SCHEDULER, BukkitTasks.SYNC_SCHEDULER),
+      new BukkitLogger()
     );
   }
 

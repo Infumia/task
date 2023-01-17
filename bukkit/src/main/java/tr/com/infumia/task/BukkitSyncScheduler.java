@@ -49,7 +49,7 @@ final class BukkitSyncScheduler implements Scheduler {
       return false;
     });
     if (plugin.isEnabled()) {
-      task.runTaskLater(plugin, Internal.ticksFrom(delay));
+      task.runTaskLater(plugin, Times.ticksFrom(delay));
     } else {
       BukkitSyncScheduler.log.error("Plugin attempted to register task while disabled!");
       BukkitSyncScheduler.log.error("The task won't be run because this is a repeating task!");
@@ -67,7 +67,7 @@ final class BukkitSyncScheduler implements Scheduler {
     final var plugin = BukkitTasks.plugin();
     final var task = new BukkitInternalTask(taskPredicate);
     if (plugin.isEnabled()) {
-      task.runTaskTimer(plugin, Internal.ticksFrom(delay), Internal.ticksFrom(interval));
+      task.runTaskTimer(plugin, Times.ticksFrom(delay), Times.ticksFrom(interval));
     } else {
       BukkitSyncScheduler.log.error("Plugin attempted to register task while disabled!");
       BukkitSyncScheduler.log.error("The task won't be run because this is a repeating task!");

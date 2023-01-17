@@ -13,6 +13,7 @@ record PromiseSupply<V>(@NotNull PromiseImpl<V> promise, @NotNull Supplier<V> su
     try {
       this.promise.complete(this.supplier.get());
     } catch (final Throwable throwable) {
+      Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);
     }
   }
