@@ -3,26 +3,25 @@ package tr.com.infumia.task;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class BukkitInternalTask extends BukkitRunnable implements InternalTask {
 
   @NotNull
-  Predicate<Task> backingTask;
+  private final Predicate<Task> backingTask;
 
   @NotNull
-  AtomicBoolean cancelled = new AtomicBoolean(false);
+  private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
   @NotNull
-  AtomicInteger counter = new AtomicInteger(0);
+  private final AtomicInteger counter = new AtomicInteger(0);
+
+  BukkitInternalTask(@NotNull final Predicate<Task> backingTask) {
+    this.backingTask = backingTask;
+  }
 
   @Override
   public int id() {

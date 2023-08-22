@@ -9,7 +9,7 @@ public interface ContextualPromiseBuilder {
   <T> Promise<T> call(@NotNull Callable<T> callable);
 
   @NotNull
-  Promise<Void> run(@NotNull Runnable runnable);
+  Promise<?> run(@NotNull Runnable runnable);
 
   @NotNull
   <T> Promise<T> supply(@NotNull Supplier<T> supplier);

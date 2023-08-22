@@ -1,26 +1,26 @@
 package tr.com.infumia.task;
 
-import java.util.function.Function;
+import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 
-final class PromiseApply<V, U> implements Runnable {
+final class PromiseFilter<V> implements Runnable {
 
   @NotNull
-  private final Function<V, ? extends U> function;
+  private final Predicate<V> filter;
 
   @NotNull
-  private final Promise<U> promise;
+  private final Promise<V> promise;
 
   @NotNull
   private final V value;
 
-  PromiseApply(
-    @NotNull final Promise<U> promise,
-    @NotNull final Function<V, ? extends U> function,
+  PromiseFilter(
+    @NotNull final Promise<V> promise,
+    @NotNull final Predicate<V> filter,
     @NotNull final V value
   ) {
     this.promise = promise;
-    this.function = function;
+    this.filter = filter;
     this.value = value;
   }
 
@@ -30,7 +30,11 @@ final class PromiseApply<V, U> implements Runnable {
       return;
     }
     try {
-      this.promise.complete(this.function.apply(this.value));
+      if (this.filter.test(this.value)) {
+        this.promise.complete(this.value);
+      } else {
+        this.promise.completeExceptionally(new PromiseFilterException());
+      }
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);

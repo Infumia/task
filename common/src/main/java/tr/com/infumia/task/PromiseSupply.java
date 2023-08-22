@@ -3,11 +3,22 @@ package tr.com.infumia.task;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
-record PromiseSupply<V>(@NotNull PromiseImpl<V> promise, @NotNull Supplier<V> supplier)
-  implements Runnable {
+final class PromiseSupply<V> implements Runnable {
+
+  @NotNull
+  private final Promise<V> promise;
+
+  @NotNull
+  private final Supplier<V> supplier;
+
+  public PromiseSupply(@NotNull final Promise<V> promise, @NotNull final Supplier<V> supplier) {
+    this.promise = promise;
+    this.supplier = supplier;
+  }
+
   @Override
   public void run() {
-    if (this.promise.cancelled.get()) {
+    if (this.promise.cancelled()) {
       return;
     }
     try {
