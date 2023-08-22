@@ -54,11 +54,11 @@ final class InternalScheduledTask implements InternalTask {
       throw new IllegalStateException("You cannot schedule the same task twice!");
     }
     this.task =
-      AsyncExecutor.INSTANCE.scheduleAtFixedRate(
-        this,
-        initialDelay.toMillis(),
-        period.toMillis(),
-        TimeUnit.MILLISECONDS
-      );
+    AsyncExecutor.INSTANCE.scheduleAtFixedRate(
+      this,
+      initialDelay.toMillis(),
+      period.toMillis(),
+      TimeUnit.MILLISECONDS
+    );
   }
 }

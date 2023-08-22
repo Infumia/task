@@ -37,7 +37,7 @@ final class AsyncExecutor extends AbstractExecutorService implements ScheduledEx
   private AsyncExecutor() {
     this.executorService = Executors.newCachedThreadPool(AsyncExecutor.thread("task-scheduler-%d"));
     this.timerExecutionService =
-      Executors.newSingleThreadScheduledExecutor(AsyncExecutor.thread("task-scheduler-timer"));
+    Executors.newSingleThreadScheduledExecutor(AsyncExecutor.thread("task-scheduler-timer"));
   }
 
   @NotNull

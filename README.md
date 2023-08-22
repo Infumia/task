@@ -20,17 +20,12 @@ final class Plugin extends JavaPlugin {
   <!-- Do NOT forget to relocate -->
   <dependency>
     <groupId>tr.com.infumia</groupId>
-    <artifactId>terminable</artifactId>
+    <artifactId>task-common</artifactId>
     <version>VERSION</version>
   </dependency>
   <dependency>
     <groupId>tr.com.infumia</groupId>
-    <artifactId>TaskCommon</artifactId>
-    <version>VERSION</version>
-  </dependency>
-  <dependency>
-    <groupId>tr.com.infumia</groupId>
-    <artifactId>TaskBukkit</artifactId>
+    <artifactId>task-bukkit</artifactId>
     <version>VERSION</version>
   </dependency>
 </dependencies>
@@ -43,8 +38,7 @@ plugins {
 
 dependencies {
   // Do NOT forget to relocate.
-  implementation "tr.com.infumia:terminable:VERSION"
-  implementation "tr.com.infumia:TaskCommon:VERSION"
-  implementation "tr.com.infumia:TaskBukkit:VERSION"
+  implementation "tr.com.infumia:task-common:VERSION"
+  implementation "tr.com.infumia:task-bukkit:VERSION"
 }
 ```

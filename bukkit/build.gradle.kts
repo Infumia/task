@@ -1,5 +1,5 @@
 dependencies {
-  compileOnlyApi(project(":common"))
+    compileOnlyApi(project(":task-common"))
 
-  compileOnly(libs.paper)
+    compileOnly(libs.bukkit)
 }
