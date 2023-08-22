@@ -6,33 +6,30 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-final class InternalScheduledTask implements InternalTask {
+@Getter
+public final class InternalScheduledTask implements InternalTask {
+
+  @NotNull
+  private final Predicate<Task> backingTask;
 
   @Getter
   @NotNull
-  Predicate<Task> backingTask;
+  private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
   @Getter
   @NotNull
-  AtomicBoolean cancelled = new AtomicBoolean(false);
-
-  @Getter
-  @NotNull
-  AtomicInteger counter = new AtomicInteger(0);
+  private final AtomicInteger counter = new AtomicInteger(0);
 
   @Nullable
-  @NonFinal
-  ScheduledFuture<?> task;
+  private ScheduledFuture<?> task;
+
+  public InternalScheduledTask(@NotNull final Predicate<Task> backingTask) {
+    this.backingTask = backingTask;
+  }
 
   @Override
   public void cancel() {
@@ -49,7 +46,10 @@ final class InternalScheduledTask implements InternalTask {
     throw new UnsupportedOperationException();
   }
 
-  void scheduleAtFixedRate(@NotNull final Duration initialDelay, @NotNull final Duration period) {
+  public void scheduleAtFixedRate(
+    @NotNull final Duration initialDelay,
+    @NotNull final Duration period
+  ) {
     if (this.task != null) {
       throw new IllegalStateException("You cannot schedule the same task twice!");
     }

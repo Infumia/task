@@ -1,27 +1,27 @@
 package tr.com.infumia.task;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
-final class PromiseApply<V, U> implements Runnable {
+final class PromiseOnError<U> implements Runnable {
 
   @NotNull
-  private final Function<V, ? extends U> function;
+  private final Consumer<Throwable> consumer;
 
   @NotNull
   private final Promise<U> promise;
 
   @NotNull
-  private final V value;
+  private final Throwable throwable;
 
-  PromiseApply(
+  public PromiseOnError(
     @NotNull final Promise<U> promise,
-    @NotNull final Function<V, ? extends U> function,
-    @NotNull final V value
+    @NotNull final Consumer<Throwable> consumer,
+    @NotNull final Throwable throwable
   ) {
     this.promise = promise;
-    this.function = function;
-    this.value = value;
+    this.consumer = consumer;
+    this.throwable = throwable;
   }
 
   @Override
@@ -30,7 +30,8 @@ final class PromiseApply<V, U> implements Runnable {
       return;
     }
     try {
-      this.promise.complete(this.function.apply(this.value));
+      this.consumer.accept(this.throwable);
+      this.promise.completeExceptionally(this.throwable);
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);

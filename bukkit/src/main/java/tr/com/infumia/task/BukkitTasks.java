@@ -12,11 +12,7 @@ import tr.com.infumia.terminable.Terminable;
 @UtilityClass
 public class BukkitTasks {
 
-  private final Scheduler ASYNC_SCHEDULER = new BukkitAsyncScheduler();
-
   private final AtomicReference<Plugin> PLUGIN = new AtomicReference<>();
-
-  private final Scheduler SYNC_SCHEDULER = new BukkitSyncScheduler();
 
   @NotNull
   public Terminable init(@NotNull final Plugin plugin) {
@@ -25,9 +21,10 @@ public class BukkitTasks {
       "Please use #init(Plugin) method in a main thread!"
     );
     BukkitTasks.PLUGIN.set(plugin);
+    final JavaLogger logger = new JavaLogger(plugin.getLogger());
     return Internal.init(
-      SchedulerProvider.of(BukkitTasks.ASYNC_SCHEDULER, BukkitTasks.SYNC_SCHEDULER),
-      new BukkitLogger()
+      SchedulerProvider.of(new BukkitAsyncScheduler(logger), new BukkitSyncScheduler(logger)),
+      logger
     );
   }
 

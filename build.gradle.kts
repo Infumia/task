@@ -17,7 +17,10 @@ subprojects {
 
     group = "tr.com.infumia"
 
-    java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 
     tasks {
         compileJava { options.encoding = Charsets.UTF_8.name() }

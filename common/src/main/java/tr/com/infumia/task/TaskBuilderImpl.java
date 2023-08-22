@@ -4,11 +4,27 @@ import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextual sync)
-  implements TaskBuilder {
+@Getter
+final class TaskBuilderImpl implements TaskBuilder {
+
   static final TaskBuilder INSTANCE = new TaskBuilderImpl();
+
+  @NotNull
+  private final ThreadContextual async;
+
+  @NotNull
+  private final ThreadContextual sync;
+
+  private TaskBuilderImpl(
+    @NotNull final ThreadContextual async,
+    @NotNull final ThreadContextual sync
+  ) {
+    this.async = async;
+    this.sync = sync;
+  }
 
   private TaskBuilderImpl() {
     this(
@@ -17,8 +33,15 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     );
   }
 
-  private record ContextualPromiseBuilderImpl(@NotNull ThreadContext context)
-    implements ContextualPromiseBuilder {
+  private static final class ContextualPromiseBuilderImpl implements ContextualPromiseBuilder {
+
+    @NotNull
+    private final ThreadContext context;
+
+    private ContextualPromiseBuilderImpl(@NotNull final ThreadContext context) {
+      this.context = context;
+    }
+
     @NotNull
     @Override
     public <T> Promise<T> call(@NotNull final Callable<T> callable) {
@@ -27,7 +50,7 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
 
     @NotNull
     @Override
-    public Promise<Void> run(@NotNull final Runnable runnable) {
+    public Promise<?> run(@NotNull final Runnable runnable) {
       return Internal.get(this.context).run(runnable);
     }
 
@@ -38,12 +61,27 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     }
   }
 
-  private record ContextualTaskBuilderImpl(
-    @NotNull ThreadContext context,
-    @NotNull Duration delay,
-    @NotNull Duration interval
-  )
-    implements ContextualTaskBuilder {
+  private static final class ContextualTaskBuilderImpl implements ContextualTaskBuilder {
+
+    @NotNull
+    private final ThreadContext context;
+
+    @NotNull
+    private final Duration delay;
+
+    @NotNull
+    private final Duration interval;
+
+    private ContextualTaskBuilderImpl(
+      @NotNull final ThreadContext context,
+      @NotNull final Duration delay,
+      @NotNull final Duration interval
+    ) {
+      this.context = context;
+      this.delay = delay;
+      this.interval = interval;
+    }
+
     @NotNull
     @Override
     public Task consume(@NotNull final Consumer<Task> consumer) {
@@ -57,8 +95,19 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     }
   }
 
-  private record DelayedBuilder(@NotNull ThreadContext context, @NotNull Duration delay)
-    implements TaskBuilder.Delayed {
+  private static final class DelayedBuilder implements TaskBuilder.Delayed {
+
+    @NotNull
+    private final ThreadContext context;
+
+    @NotNull
+    private final Duration delay;
+
+    private DelayedBuilder(@NotNull final ThreadContext context, @NotNull final Duration delay) {
+      this.context = context;
+      this.delay = delay;
+    }
+
     @NotNull
     @Override
     public <T> Promise<T> call(@NotNull final Callable<T> callable) {
@@ -67,7 +116,7 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
 
     @NotNull
     @Override
-    public Promise<Void> run(@NotNull final Runnable runnable) {
+    public Promise<?> run(@NotNull final Runnable runnable) {
       return Internal.get(this.context).runLater(runnable, this.delay);
     }
 
@@ -84,11 +133,22 @@ record TaskBuilderImpl(@NotNull ThreadContextual async, @NotNull ThreadContextua
     }
   }
 
-  private record ThreadContextualBuilder(
-    @NotNull ThreadContext context,
-    @NotNull ContextualPromiseBuilder instant
-  )
-    implements TaskBuilder.ThreadContextual {
+  private static final class ThreadContextualBuilder implements TaskBuilder.ThreadContextual {
+
+    @NotNull
+    private final ThreadContext context;
+
+    @NotNull
+    private final ContextualPromiseBuilder instant;
+
+    private ThreadContextualBuilder(
+      @NotNull final ThreadContext context,
+      @NotNull final ContextualPromiseBuilder instant
+    ) {
+      this.context = context;
+      this.instant = instant;
+    }
+
     private ThreadContextualBuilder(@NotNull final ThreadContext context) {
       this(context, new ContextualPromiseBuilderImpl(context));
     }

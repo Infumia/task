@@ -2,6 +2,7 @@ package tr.com.infumia.task;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -9,15 +10,21 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public interface Scheduler {
+public interface Scheduler extends Executor {
   @NotNull
   default <T> Promise<T> call(@NotNull final Callable<T> callable) {
-    return this.supply(new CallableToSupplier<>(callable));
+    return this.supply(() -> {
+        try {
+          return callable.call();
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+      });
   }
 
   @NotNull
   default <T> Promise<T> callLater(@NotNull final Callable<T> callable, final long delayTicks) {
-    return this.callLater(callable, Times.durationFrom(delayTicks));
+    return this.callLater(callable, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -26,7 +33,7 @@ public interface Scheduler {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.callLater(callable, Times.durationFrom(delay, unit));
+    return this.callLater(callable, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
@@ -34,31 +41,45 @@ public interface Scheduler {
     @NotNull final Callable<T> callable,
     @NotNull final Duration delay
   ) {
-    return this.supplyLater(new CallableToSupplier<>(callable), delay);
+    return this.supplyLater(
+        () -> {
+          try {
+            return callable.call();
+          } catch (final Exception e) {
+            throw new RuntimeException(e);
+          }
+        },
+        delay
+      );
   }
 
   @NotNull
   ThreadContext context();
 
-  @NotNull
-  Promise<Void> run(@NotNull Runnable runnable);
-
-  @NotNull
-  default Promise<Void> runLater(@NotNull final Runnable runnable, final long delayTicks) {
-    return this.runLater(runnable, Times.durationFrom(delayTicks));
+  @Override
+  default void execute(@NotNull final Runnable command) {
+    this.run(command);
   }
 
   @NotNull
-  default Promise<Void> runLater(
+  Promise<?> run(@NotNull Runnable runnable);
+
+  @NotNull
+  default Promise<?> runLater(@NotNull final Runnable runnable, final long delayTicks) {
+    return this.runLater(runnable, Internal.durationFrom(delayTicks));
+  }
+
+  @NotNull
+  default Promise<?> runLater(
     @NotNull final Runnable runnable,
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.runLater(runnable, Times.durationFrom(delay, unit));
+    return this.runLater(runnable, Internal.durationFrom(delay, unit));
   }
 
   @NotNull
-  Promise<Void> runLater(@NotNull Runnable runnable, @NotNull Duration delay);
+  Promise<?> runLater(@NotNull Runnable runnable, @NotNull Duration delay);
 
   @NotNull
   default Task runRepeating(
@@ -68,8 +89,8 @@ public interface Scheduler {
   ) {
     return this.runRepeating(
         taskConsumer,
-        Times.durationFrom(delayTicks),
-        Times.durationFrom(intervalTicks)
+        Internal.durationFrom(delayTicks),
+        Internal.durationFrom(intervalTicks)
       );
   }
 
@@ -83,8 +104,8 @@ public interface Scheduler {
   ) {
     return this.runRepeating(
         taskConsumer,
-        Times.durationFrom(delay, delayUnit),
-        Times.durationFrom(interval, intervalUnit)
+        Internal.durationFrom(delay, delayUnit),
+        Internal.durationFrom(interval, intervalUnit)
       );
   }
 
@@ -95,7 +116,10 @@ public interface Scheduler {
     @NotNull final Duration interval
   ) {
     return this.runRepeatingCloseIf(
-        new ConsumerToPredicate<>(taskConsumer, false),
+        task -> {
+          taskConsumer.accept(task);
+          return false;
+        },
         delay,
         interval
       );
@@ -109,8 +133,8 @@ public interface Scheduler {
   ) {
     return this.runRepeating(
         runnable,
-        Times.durationFrom(delayTicks),
-        Times.durationFrom(intervalTicks)
+        Internal.durationFrom(delayTicks),
+        Internal.durationFrom(intervalTicks)
       );
   }
 
@@ -124,8 +148,8 @@ public interface Scheduler {
   ) {
     return this.runRepeating(
         runnable,
-        Times.durationFrom(delay, delayUnit),
-        Times.durationFrom(interval, intervalUnit)
+        Internal.durationFrom(delay, delayUnit),
+        Internal.durationFrom(interval, intervalUnit)
       );
   }
 
@@ -135,7 +159,7 @@ public interface Scheduler {
     @NotNull final Duration delay,
     @NotNull final Duration interval
   ) {
-    return this.runRepeating(new RunnableToConsumer<>(runnable), delay, interval);
+    return this.runRepeating(__ -> runnable.run(), delay, interval);
   }
 
   @NotNull
@@ -146,8 +170,8 @@ public interface Scheduler {
   ) {
     return this.runRepeatingCloseIf(
         taskPredicate,
-        Times.durationFrom(delayTicks),
-        Times.durationFrom(intervalTicks)
+        Internal.durationFrom(delayTicks),
+        Internal.durationFrom(intervalTicks)
       );
   }
 
@@ -161,8 +185,8 @@ public interface Scheduler {
   ) {
     return this.runRepeatingCloseIf(
         taskPredicate,
-        Times.durationFrom(delay, delayUnit),
-        Times.durationFrom(interval, intervalUnit)
+        Internal.durationFrom(delay, delayUnit),
+        Internal.durationFrom(interval, intervalUnit)
       );
   }
 
@@ -181,8 +205,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeating(
         task,
-        Times.durationFrom(delayTicks),
-        Times.durationFrom(intervalTicks)
+        Internal.durationFrom(delayTicks),
+        Internal.durationFrom(intervalTicks)
       );
   }
 
@@ -195,8 +219,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeating(
         task,
-        Times.durationFrom(delay, unit),
-        Times.durationFrom(interval, unit)
+        Internal.durationFrom(delay, unit),
+        Internal.durationFrom(interval, unit)
       );
   }
 
@@ -206,7 +230,7 @@ public interface Scheduler {
     @NotNull final Duration delay,
     @NotNull final Duration interval
   ) {
-    return this.scheduleRepeating(new RunnableToConsumer<>(task), delay, interval);
+    return this.scheduleRepeating(__ -> task.run(), delay, interval);
   }
 
   @NotNull
@@ -217,8 +241,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeating(
         taskConsumer,
-        Times.durationFrom(delayTicks),
-        Times.durationFrom(intervalTicks)
+        Internal.durationFrom(delayTicks),
+        Internal.durationFrom(intervalTicks)
       );
   }
 
@@ -231,8 +255,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeating(
         taskConsumer,
-        Times.durationFrom(delay, unit),
-        Times.durationFrom(delay, unit)
+        Internal.durationFrom(delay, unit),
+        Internal.durationFrom(delay, unit)
       );
   }
 
@@ -243,7 +267,10 @@ public interface Scheduler {
     @NotNull final Duration interval
   ) {
     return this.scheduleRepeatingCloseIf(
-        new ConsumerToPredicate<>(taskConsumer, false),
+        task -> {
+          taskConsumer.accept(task);
+          return false;
+        },
         delay,
         interval
       );
@@ -257,8 +284,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeatingCloseIf(
         taskPredicate,
-        Times.durationFrom(delayTicks),
-        Times.durationFrom(intervalTicks)
+        Internal.durationFrom(delayTicks),
+        Internal.durationFrom(intervalTicks)
       );
   }
 
@@ -271,8 +298,8 @@ public interface Scheduler {
   ) {
     return this.scheduleRepeatingCloseIf(
         taskPredicate,
-        Times.durationFrom(delay, unit),
-        Times.durationFrom(delay, unit)
+        Internal.durationFrom(delay, unit),
+        Internal.durationFrom(delay, unit)
       );
   }
 
@@ -290,7 +317,7 @@ public interface Scheduler {
 
   @NotNull
   default <T> Promise<T> supplyLater(@NotNull final Supplier<T> supplier, final long delayTicks) {
-    return this.supplyLater(supplier, Times.durationFrom(delayTicks));
+    return this.supplyLater(supplier, Internal.durationFrom(delayTicks));
   }
 
   @NotNull
@@ -299,7 +326,7 @@ public interface Scheduler {
     final long delay,
     @NotNull final TimeUnit unit
   ) {
-    return this.supplyLater(supplier, Times.durationFrom(delay, unit));
+    return this.supplyLater(supplier, Internal.durationFrom(delay, unit));
   }
 
   @NotNull

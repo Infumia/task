@@ -1,29 +1,55 @@
 package tr.com.infumia.task;
 
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 
-record PromiseCompose<V, U>(
-  @NotNull PromiseImpl<U> promise,
-  @NotNull Function<? super V, ? extends Promise<U>> function,
-  @NotNull V value,
-  boolean sync
-)
-  implements Runnable {
+final class PromiseCompose<V, U> implements Runnable {
+
+  @NotNull
+  private final Function<V, ? extends Promise<U>> function;
+
+  @NotNull
+  private final Promise<U> promise;
+
+  private final boolean sync;
+
+  @NotNull
+  private final V value;
+
+  PromiseCompose(
+    @NotNull final Promise<U> promise,
+    @NotNull final Function<V, ? extends Promise<U>> function,
+    @NotNull final V value,
+    final boolean sync
+  ) {
+    this.promise = promise;
+    this.function = function;
+    this.value = value;
+    this.sync = sync;
+  }
+
   @Override
   public void run() {
-    if (this.promise.cancelled.get()) {
+    if (this.promise.cancelled()) {
       return;
     }
     try {
-      final var p = this.function.apply(this.value);
-      if (p == null) {
+      final Promise<U> promise = this.function.apply(this.value);
+      if (promise == null) {
         this.promise.complete(null);
       } else {
+        final BiConsumer<U, Throwable> action = (u, throwable) -> {
+          if (throwable == null) {
+            this.promise.complete(u);
+          } else {
+            this.promise.completeExceptionally(throwable);
+          }
+        };
         if (this.sync) {
-          p.thenAcceptSync(this.promise::complete);
+          promise.whenCompleteSync(action);
         } else {
-          p.thenAcceptAsync(this.promise::complete);
+          promise.whenCompleteAsync(action);
         }
       }
     } catch (final Throwable throwable) {

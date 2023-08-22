@@ -1,27 +1,33 @@
 package tr.com.infumia.task;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-final class PromiseApply<V, U> implements Runnable {
+final class PromiseHandle<V, U> implements Runnable {
 
   @NotNull
-  private final Function<V, ? extends U> function;
+  private final BiFunction<V, Throwable, ? extends U> function;
 
   @NotNull
   private final Promise<U> promise;
 
-  @NotNull
+  @Nullable
+  private final Throwable throwable;
+
+  @Nullable
   private final V value;
 
-  PromiseApply(
+  public PromiseHandle(
     @NotNull final Promise<U> promise,
-    @NotNull final Function<V, ? extends U> function,
-    @NotNull final V value
+    @NotNull final BiFunction<V, Throwable, ? extends U> function,
+    @Nullable final V value,
+    @Nullable final Throwable throwable
   ) {
     this.promise = promise;
     this.function = function;
     this.value = value;
+    this.throwable = throwable;
   }
 
   @Override
@@ -30,7 +36,7 @@ final class PromiseApply<V, U> implements Runnable {
       return;
     }
     try {
-      this.promise.complete(this.function.apply(this.value));
+      this.promise.complete(this.function.apply(this.value, this.throwable));
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);

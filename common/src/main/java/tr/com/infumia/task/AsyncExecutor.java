@@ -16,14 +16,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-final class AsyncExecutor extends AbstractExecutorService implements ScheduledExecutorService {
+public final class AsyncExecutor
+  extends AbstractExecutorService
+  implements ScheduledExecutorService {
 
-  static final AsyncExecutor INSTANCE = new AsyncExecutor();
+  public static final AsyncExecutor INSTANCE = new AsyncExecutor();
 
   @NotNull
   ExecutorService executorService;
@@ -47,8 +48,8 @@ final class AsyncExecutor extends AbstractExecutorService implements ScheduledEx
 
       @Override
       public Thread newThread(@NotNull final Runnable r) {
-        final var thread = Executors.defaultThreadFactory().newThread(r);
-        thread.setName(format.formatted(this.count.getAndIncrement()));
+        final Thread thread = Executors.defaultThreadFactory().newThread(r);
+        thread.setName(String.format(format, this.count.getAndIncrement()));
         thread.setDaemon(true);
         return thread;
       }
@@ -140,7 +141,7 @@ final class AsyncExecutor extends AbstractExecutorService implements ScheduledEx
 
   void cancelRepeatingTasks() {
     synchronized (this.tasks) {
-      for (final var task : this.tasks) {
+      for (final ScheduledFuture<?> task : this.tasks) {
         task.cancel(false);
       }
     }
@@ -154,7 +155,6 @@ final class AsyncExecutor extends AbstractExecutorService implements ScheduledEx
     return future;
   }
 
-  @RequiredArgsConstructor
   @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
   private static final class FixedRateWorker implements Runnable {
 
@@ -169,6 +169,11 @@ final class AsyncExecutor extends AbstractExecutorService implements ScheduledEx
 
     @NotNull
     AtomicInteger running = new AtomicInteger(0);
+
+    FixedRateWorker(@NotNull final Runnable delegate, @NotNull final AsyncExecutor executor) {
+      this.delegate = delegate;
+      this.executor = executor;
+    }
 
     @Override
     public void run() {
