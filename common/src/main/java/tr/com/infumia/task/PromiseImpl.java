@@ -19,6 +19,9 @@ public final class PromiseImpl<V> implements Promise<V> {
 
   private final AtomicBoolean supplied = new AtomicBoolean(false);
 
+  @Nullable
+  private Promise<?> parent;
+
   PromiseImpl() {
     this.future = new CompletableFuture<>();
   }
@@ -36,6 +39,9 @@ public final class PromiseImpl<V> implements Promise<V> {
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
+    if (this.parent != null) {
+      this.parent.cancel(mayInterruptIfRunning);
+    }
     this.cancelled.set(true);
     return this.future().cancel(mayInterruptIfRunning);
   }
@@ -43,6 +49,17 @@ public final class PromiseImpl<V> implements Promise<V> {
   @Override
   public boolean cancelled() {
     return this.cancelled.get();
+  }
+
+  @NotNull
+  @Override
+  public Promise<V> setParent(@NotNull final Promise<?> parent) {
+    if (this.parent == null) {
+      this.parent = parent;
+    } else {
+      this.parent.setParent(parent);
+    }
+    return this;
   }
 
   @NotNull

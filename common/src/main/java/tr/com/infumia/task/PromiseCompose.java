@@ -39,6 +39,7 @@ final class PromiseCompose<V, U> implements Runnable {
       if (promise == null) {
         this.promise.complete(null);
       } else {
+        promise.setParent(this.promise);
         final BiConsumer<U, Throwable> action = (u, throwable) -> {
           if (throwable == null) {
             this.promise.complete(u);
