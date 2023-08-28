@@ -42,6 +42,8 @@ final class PromiseWhenComplete<U> implements Runnable {
       } else {
         this.promise.completeExceptionally(this.throwable);
       }
+    } catch (final PromiseFilterException filter) {
+      this.promise.completeExceptionally(filter);
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);

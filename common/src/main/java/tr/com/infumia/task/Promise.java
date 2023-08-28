@@ -736,6 +736,12 @@ public interface Promise<V> extends Future<V>, Terminable {
   }
 
   @NotNull
+  Promise<V> setParent(@Nullable Promise<?> parent);
+
+  @NotNull
+  Promise<V> setChild(@Nullable Promise<?> child);
+
+  @NotNull
   Promise<V> supply(V value);
 
   @NotNull
@@ -1582,7 +1588,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     @NotNull final BiConsumer<Promise<U>, V> onSuccess,
     @NotNull final BiConsumer<Promise<U>, Throwable> onError
   ) {
-    final Promise<U> promise = Promise.empty();
+    final Promise<U> promise = Promise.<U>empty().setParent(this);
     this.future()
       .whenComplete((v, t) -> {
         if (t == null) {

@@ -36,6 +36,7 @@ final class PromiseCompose<V, U> implements Runnable {
     }
     try {
       final Promise<U> promise = this.function.apply(this.value);
+      this.promise.setChild(promise);
       if (promise == null) {
         this.promise.complete(null);
       } else {
@@ -52,6 +53,8 @@ final class PromiseCompose<V, U> implements Runnable {
           promise.whenCompleteAsync(action);
         }
       }
+    } catch (final PromiseFilterException filter) {
+      this.promise.completeExceptionally(filter);
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);

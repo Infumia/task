@@ -31,6 +31,8 @@ final class PromiseApply<V, U> implements Runnable {
     }
     try {
       this.promise.complete(this.function.apply(this.value));
+    } catch (final PromiseFilterException filter) {
+      this.promise.completeExceptionally(filter);
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);
