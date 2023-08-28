@@ -22,6 +22,9 @@ public final class PromiseImpl<V> implements Promise<V> {
   @Nullable
   private Promise<?> parent;
 
+  @Nullable
+  private Promise<?> child;
+
   PromiseImpl() {
     this.future = new CompletableFuture<>();
   }
@@ -42,6 +45,9 @@ public final class PromiseImpl<V> implements Promise<V> {
     if (this.parent != null) {
       this.parent.cancel(mayInterruptIfRunning);
     }
+    if (this.child != null) {
+      this.child.cancel(mayInterruptIfRunning);
+    }
     this.cancelled.set(true);
     return this.future().cancel(mayInterruptIfRunning);
   }
@@ -53,12 +59,15 @@ public final class PromiseImpl<V> implements Promise<V> {
 
   @NotNull
   @Override
-  public Promise<V> setParent(@NotNull final Promise<?> parent) {
-    if (this.parent == null) {
-      this.parent = parent;
-    } else {
-      this.parent.setParent(parent);
-    }
+  public Promise<V> setParent(@Nullable final Promise<?> parent) {
+    this.parent = parent;
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public Promise<V> setChild(@Nullable final Promise<?> child) {
+    this.child = child;
     return this;
   }
 

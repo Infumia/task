@@ -736,7 +736,10 @@ public interface Promise<V> extends Future<V>, Terminable {
   }
 
   @NotNull
-  Promise<V> setParent(@NotNull Promise<?> parent);
+  Promise<V> setParent(@Nullable Promise<?> parent);
+
+  @NotNull
+  Promise<V> setChild(@Nullable Promise<?> child);
 
   @NotNull
   Promise<V> supply(V value);
