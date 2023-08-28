@@ -24,7 +24,7 @@ public interface InternalTask extends Task, Runnable {
 
   @Override
   default void run() {
-    if (this.cancelled().get()) {
+    if (this.closed()) {
       this.cancel();
       return;
     }
@@ -37,7 +37,7 @@ public interface InternalTask extends Task, Runnable {
     } catch (final Throwable e) {
       e.printStackTrace();
     }
-    if (this.cancelled().get()) {
+    if (this.closed()) {
       this.cancel();
     }
   }
