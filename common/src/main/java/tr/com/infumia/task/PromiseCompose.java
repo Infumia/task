@@ -52,6 +52,8 @@ final class PromiseCompose<V, U> implements Runnable {
           promise.whenCompleteAsync(action);
         }
       }
+    } catch (final PromiseFilterException filter) {
+      this.promise.completeExceptionally(filter);
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);

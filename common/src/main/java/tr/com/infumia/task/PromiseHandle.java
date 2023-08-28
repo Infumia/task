@@ -37,6 +37,8 @@ final class PromiseHandle<V, U> implements Runnable {
     }
     try {
       this.promise.complete(this.function.apply(this.value, this.throwable));
+    } catch (final PromiseFilterException filter) {
+      this.promise.completeExceptionally(filter);
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);

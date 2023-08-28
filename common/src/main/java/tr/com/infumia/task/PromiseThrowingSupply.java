@@ -23,6 +23,8 @@ final class PromiseThrowingSupply<V> implements Runnable {
     }
     try {
       this.promise.complete(this.supplier.call());
+    } catch (final PromiseFilterException filter) {
+      this.promise.completeExceptionally(filter);
     } catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
       this.promise.completeExceptionally(throwable);
