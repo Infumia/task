@@ -15,9 +15,7 @@ final class UncheckedRunnable implements Runnable {
   public void run() {
     try {
       this.delegate.run();
-    } catch (final PromiseFilterException filter) {
-      this.promise.completeExceptionally(filter);
-    } catch (final Throwable throwable) {
+    } catch (final PromiseFilterException ignored) {} catch (final Throwable throwable) {
       Internal.logger().severe(throwable.getMessage(), throwable);
     }
   }
