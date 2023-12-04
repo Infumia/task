@@ -5,5 +5,5 @@ terminable = { module = "tr.com.infumia:terminable", version = "0.1.4" }
 bukkit = { module = "org.bukkit:bukkit", version = "1.8-R0.1-SNAPSHOT" }
 
 [plugins]
-spotless = { id = "com.diffplug.spotless", version = "6.23.2" }
+spotless = { id = "com.diffplug.spotless", version = "6.23.3" }
 nexus = { id = "io.github.gradle-nexus.publish-plugin", version = "1.3.0" }
